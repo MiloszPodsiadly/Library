@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.repository.CrudRepository;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Long> {
-    List<Book> findByAvailableTrue();
-    Optional<Book> findByIdAndAvailableTrue(Long id);
+public interface BookRepository extends CrudRepository<Book, Long> {
+    Optional<Book> findByIsbn(String isbn);
+    List<Book> findAll();
 }
+

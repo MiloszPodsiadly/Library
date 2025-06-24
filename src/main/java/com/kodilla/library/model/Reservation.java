@@ -7,27 +7,55 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.JoinColumn;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Table(name = "reservations")
 public class Reservation {
-    @Id @GeneratedValue
-    private Long id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idReservation;
 
     @ManyToOne
-    private Book book;
-
-    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    private LocalDate reservationDate;
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book book;
 
-    public Reservation(Book book, User user, LocalDate reservationDate) {
-        this.book = book;
-        this.user = user;
-        this.reservationDate = reservationDate;
-    }
+    @Column(name = "reservation_date")
+    private LocalDateTime reservationDate;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Builder.Default
+    @Setter
+    private Boolean active = true;
+
+    @Builder.Default
+    @JoinColumn(name = "reservation_count")
+    private Integer reservationOrder = 1;
+
+    @Column(name = "start_date")
+    private LocalDateTime startDate;  // Data rozpoczęcia rezerwacji
+
+    @Column(name = "end_date")
+    private LocalDateTime endDate;    // Data zakończenia rezerwacji
 }
+
 

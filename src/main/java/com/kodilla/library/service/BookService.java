@@ -1,41 +1,55 @@
 package com.kodilla.library.service;
-import com.kodilla.library.repository.BookRepository;
-import org.springframework.stereotype.Service;
-import com.kodilla.library.dto.BookDto;
+
+import com.kodilla.library.exception.BookNotFoundByIdException;
 import com.kodilla.library.model.Book;
+import com.kodilla.library.repository.BookRepository;
+import com.kodilla.library.model.Loan;
+import com.kodilla.library.model.Reservation;
+import com.kodilla.library.model.Review;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.HashSet;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BookService {
 
     private final BookRepository bookRepository;
 
-    public BookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
     }
 
-    // Dodawanie książki
-    public BookDto addBook(String title, String author) {
-        Book book = new Book(title, author, true);
-        Book savedBook = bookRepository.save(book);
-        return toDto(savedBook);  // Zwracamy BookDto po zapisaniu książki
+    public Book getBookById(Long idBook) throws BookNotFoundByIdException {
+        return bookRepository.findById(idBook)
+                .orElseThrow(() -> new BookNotFoundByIdException(idBook));
     }
 
-    // Oznaczenie książki jako niedostępnej
-    public BookDto markAsUnavailable(Long bookId) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
-        book.setAvailable(false);
-        Book savedBook = bookRepository.save(book);
-        return toDto(savedBook);  // Zwracamy BookDto po zapisaniu
+    public Book addBook(Book book) {
+        return bookRepository.save(book);
     }
-    // Pomocnicza metoda do konwersji encji Book na BookDto
-    private BookDto toDto(Book book) {
-        return new BookDto(
-                book.getId(),
-                book.getTitle(),
-                book.getAuthor(),
-                book.isAvailable()
-        );
+
+    @Transactional
+    public Book updateBook(Long idBook, Book updatedBook) throws BookNotFoundByIdException {
+        Book existing = bookRepository.findById(idBook)
+                .orElseThrow(() -> new BookNotFoundByIdException(idBook));
+
+        existing.setTitle(updatedBook.getTitle());
+        existing.setAuthor(updatedBook.getAuthor());
+        existing.setIsbn(updatedBook.getIsbn());
+        existing.setAvailable(updatedBook.getAvailable());
+        existing.getStatuses().clear();
+        existing.getStatuses().addAll(updatedBook.getStatuses());
+
+        return bookRepository.save(existing);
+    }
+
+    public void deleteBook(Long idBook) throws BookNotFoundByIdException {
+        Book book = bookRepository.findById(idBook)
+                .orElseThrow(() -> new BookNotFoundByIdException(idBook));
+        bookRepository.delete(book);
     }
 }
 

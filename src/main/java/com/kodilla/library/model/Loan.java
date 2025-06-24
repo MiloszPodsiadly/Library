@@ -7,31 +7,52 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ArrayList;
+import jakarta.persistence.Table;
 @Entity
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Table(name = "loans")
 public class Loan {
-    @Id @GeneratedValue
-    private Long id;
 
-    @ManyToOne
-    private Book book;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idLoan;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    private LocalDate startDate;
-    private LocalDate dueDate;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "book_id")
+    private Book book;
 
-    private boolean extended = false;
-    public Loan(Book book, User user, LocalDate startDate, LocalDate dueDate, boolean extended) {
-        this.book = book;
-        this.user = user;
-        this.startDate = startDate;
-        this.dueDate = dueDate;
-        this.extended = extended;
-    }
+    private LocalDateTime loanDate;
+    @Setter
+    private LocalDateTime returnDate;
+
+    @Builder.Default
+    @Setter
+    private Boolean returned = false;
+
+    @Builder.Default
+    @Setter
+    private Integer extensionCount = 0;
+
+    @OneToOne(mappedBy = "loan", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Fine fine;
+
 }
 

@@ -1,82 +1,124 @@
 package com.kodilla.library.service;
-import com.kodilla.library.repository.BookRepository;
-import com.kodilla.library.repository.ReservationRepository;
+
+import com.kodilla.library.exception.*;
+import com.kodilla.library.model.*;
+import com.kodilla.library.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.kodilla.library.dto.ReservationDto;
-import com.kodilla.library.model.Book;
-import com.kodilla.library.model.Reservation;
-import com.kodilla.library.model.User;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Optional;
-import com.kodilla.library.model.UserEntity;
-import com.kodilla.library.repository.UserRepository;
-import com.kodilla.library.service.UserService;
-import com.kodilla.library.controller.ReservationController;
-
-
-
 
 @Service
+@RequiredArgsConstructor
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, BookRepository bookRepository,UserRepository userRepository) {
-        this.reservationRepository = reservationRepository;
-        this.bookRepository = bookRepository;
-        this.userRepository =userRepository;
-    }
+    public Reservation reserveBook(Long idUser, Long idBook)
+            throws BookNotFoundByIdException, UserNotFoundByIdException {
 
-    // Tworzenie rezerwacji i zwracanie DTO
-    public ReservationDto createReservation(User user, Long bookId) {
-        Book book = bookRepository.findByIdAndAvailableTrue(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not available"));
+        // 1. Znajdź użytkownika i książkę
+        User user = userRepository.findById(idUser)
+                .orElseThrow(() -> new UserNotFoundByIdException(idUser));
 
-        if (reservationRepository.findByBookAndUser(book, user).isPresent()) {
-            throw new RuntimeException("You have already reserved this book");
+        Book book = bookRepository.findById(idBook)
+                .orElseThrow(() -> new BookNotFoundByIdException(idBook));
+
+        // 2. Sprawdź, czy użytkownik już ma aktywną rezerwację tej książki
+        boolean alreadyReserved = reservationRepository.existsByUser_IdUserAndBook_IdBookAndActiveTrue(idUser, idBook);
+        if (alreadyReserved) {
+            throw new IllegalStateException("User already has an active reservation for this book.");
         }
 
-        Reservation reservation = new Reservation(book, user, LocalDate.now());
+        // 3. Wylicz datę rozpoczęcia nowej rezerwacji
+        LocalDateTime reservationStart = calculateNextAvailableDate(book.getIdBook());
+
+        // 4. Oblicz kolejność rezerwacji (np. 0, 1, 2...)
+        long reservationOrder = reservationRepository.countByBook_IdBook(idBook);
+
+        // 5. Zbuduj rezerwację
+        Reservation reservation = Reservation.builder()
+                .user(user)
+                .book(book)
+                .reservationDate(reservationStart)
+                .active(true)
+                .reservationOrder((int) reservationOrder)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        // 6. Zaktualizuj status książki
+        book.getStatuses().add(BookStatus.RESERVED);
+        bookRepository.save(book);
+
+        // 7. Zapisz rezerwację
+        return reservationRepository.save(reservation);
+    }
+
+    public LocalDateTime calculateNextAvailableDate(Long idBook) {
+        // 1. Pobierz wszystkie rezerwacje dla danej książki (zarówno aktywne, jak i zakończone)
+        List<Reservation> reservations = reservationRepository.findAllByBook_IdBook(idBook);
+
+        // 2. Jeśli książka nie ma jeszcze żadnych rezerwacji – uznaj, że dostępna jest od razu
+        if (reservations.isEmpty()) {
+            return LocalDateTime.now()
+                    .withHour(10).withMinute(0).withSecond(0).withNano(0); // normalizujemy godzinę
+        }
+
+        // 3. Znajdź najpóźniejszą datę zakończenia rezerwacji
+        LocalDateTime lastReservationEndDate = reservations.stream()
+                .map(Reservation::getEndDate) // pobieramy daty zakończenia
+                .max(LocalDateTime::compareTo) // wybieramy najpóźniejszą
+                .orElse(LocalDateTime.now());  // fallback jeśli coś pójdzie nie tak (powinno być niemożliwe)
+
+        // 4. Ustaw dostępność książki na dzień po ostatniej rezerwacji
+        return lastReservationEndDate.plusDays(1)
+                .withHour(10).withMinute(0).withSecond(0).withNano(0); // godzina otwarcia wypożyczalni
+    }
+
+
+    public void cancelReservation(Long idReservation) throws ReservationNotFoundException {
+        // Znajdź rezerwację lub rzuć wyjątek
+        Reservation reservation = reservationRepository.findById(idReservation)
+                .orElseThrow(() -> new ReservationNotFoundException(idReservation));
+
+        // Sprawdź, czy anulowanie jest dozwolone (maksymalnie 1 godzina od utworzenia)
+        if (reservation.getCreatedAt().plusHours(1).isBefore(LocalDateTime.now())) {
+            throw new ReservationNotAllowedException("You can only cancel within 1 hour of reservation.");
+        }
+
+        // Ustaw rezerwację jako nieaktywną
+        reservation.setActive(false);
         reservationRepository.save(reservation);
 
-        return toDto(reservation);  // Zwracamy DTO
+        // Sprawdź, czy książka ma jakiekolwiek aktywne rezerwacje — jeśli nie, usuń status RESERVED
+        Book book = reservation.getBook();
+        boolean anyStillActive = reservationRepository
+                .findAllByBook_IdBook(book.getIdBook())
+                .stream()
+                .anyMatch(Reservation::getActive);
+
+        if (!anyStillActive) {
+            book.getStatuses().remove(BookStatus.RESERVED);
+            bookRepository.save(book);
+        }
     }
 
-    // Pobranie rezerwacji dla książki
-    public List<ReservationDto> getReservationsForBook(Long bookId) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
-        List<Reservation> reservations = reservationRepository.findByBookAndReservationDateAfter(book, LocalDate.now());
-        return reservations.stream().map(this::toDto).collect(Collectors.toList());
+    public List<Reservation> getReservationsByUser(Long userId) throws UserNotFoundByIdException {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundByIdException(userId);
+        }
+        return reservationRepository.findAllByUser_IdUser(userId);
     }
 
-    //Pobranie rezerwacji dla użytkownika
-    public List<ReservationDto> getUserReservations(Long id) {
-        // Znajdź użytkownika na podstawie id
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Pobierz wszystkie rezerwacje dla użytkownika
-        List<Reservation> reservations = reservationRepository.findByUser(user);
-
-        // Zamień listę rezerwacji na listę DTO
-        return reservations.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public List<Reservation> getReservationsForBook(Long bookId) throws BookNotFoundByIdException {
+        if (!bookRepository.existsById(bookId)) {
+            throw new BookNotFoundByIdException(bookId);
+        }
+        return reservationRepository.findAllByBook_IdBook(bookId);
     }
-
-    // Helper method to convert Reservation to ReservationDto
-    private ReservationDto toDto(Reservation reservation) {
-        return new ReservationDto(
-                reservation.getId(),
-                reservation.getBook().getId(),
-                reservation.getUser().getId(),
-                reservation.getReservationDate()
-        );
-    }
-
 }
