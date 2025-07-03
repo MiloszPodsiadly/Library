@@ -48,8 +48,8 @@ public class Reservation {
     @Column(name = "status_active")
     private Boolean active = true;
 
+    @Column(name = "reservation_count")
     @Builder.Default
-    @JoinColumn(name = "reservation_count")
     private Integer reservationOrder = 1;
 
     @Column(name = "start_date")

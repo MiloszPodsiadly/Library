@@ -50,7 +50,8 @@ public class Loan {
     @Setter
     private Integer extensionCount = 0;
 
-    @OneToOne(mappedBy = "loan", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Setter
     private Fine fine;
 
 }

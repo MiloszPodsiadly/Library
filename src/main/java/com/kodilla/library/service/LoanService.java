@@ -115,6 +115,25 @@ public class LoanService {
 
         return loanRepository.save(loan);
     }
+    public Loan returnBook(Long idLoan) throws LoanNotFoundByIdException {
+        Loan loan = loanRepository.findById(idLoan)
+                .orElseThrow(() -> new LoanNotFoundByIdException(idLoan));
+
+        if (loan.getReturned()) {
+            return loan;
+        }
+
+        loan.setReturned(true);
+        loan.setReturnDate(LocalDateTime.now());
+
+        Book book = loan.getBook();
+        book.setAvailable(true);
+        book.getStatuses().clear();
+        book.getStatuses().add(BookStatus.AVAILABLE);
+
+        bookRepository.save(book);
+        return loanRepository.save(loan);
+    }
 
 
     @Scheduled(fixedRate = 5 * 60 * 1000)

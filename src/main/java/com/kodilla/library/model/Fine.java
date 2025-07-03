@@ -19,6 +19,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,20 +34,16 @@ public class Fine {
     @JoinColumn(name = "loan_id")
     private Loan loan;
 
-    @Setter
     private BigDecimal amount;
 
-    @Setter
     private String reason;
 
     private LocalDateTime issuedDate;
 
     @Builder.Default
-    @Setter
     private Boolean paid = false;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 }
-

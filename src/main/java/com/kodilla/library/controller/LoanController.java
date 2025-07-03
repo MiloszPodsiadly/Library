@@ -1,18 +1,9 @@
 package com.kodilla.library.controller;
 
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import com.kodilla.library.dto.LoanDTO;
 import com.kodilla.library.exception.BookNotFoundByIdException;
 import com.kodilla.library.exception.LoanNotAllowedException;

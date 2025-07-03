@@ -46,7 +46,7 @@ public class ReservationController {
         return ResponseEntity.ok("Reservation cancelled");
     }
 
-    @DeleteMapping("/{idReservation}")
+    @DeleteMapping("/delete/{idReservation}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long idReservation)
             throws ReservationNotFoundException, ReservationNotAllowedException {
         reservationService.deleteReservation(idReservation);
