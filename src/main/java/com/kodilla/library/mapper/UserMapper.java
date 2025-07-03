@@ -1,11 +1,12 @@
 package com.kodilla.library.mapper;
 
-import com.kodilla.library.dto.UserDTO;
-import com.kodilla.library.model.User;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import com.kodilla.library.dto.UserDTO;
+import com.kodilla.library.model.User;
 
 @Component
 public class UserMapper {
@@ -21,7 +22,7 @@ public class UserMapper {
                 user.getToken(),
                 user.getTokenCreatedAt(),
                 user.getTokenExpiresAt(),
-                null // ❌ nie zwracamy rawPassword w odpowiedzi!
+                null
         );
     }
 
@@ -35,7 +36,7 @@ public class UserMapper {
                 .token(dto.token())
                 .tokenCreatedAt(dto.tokenCreatedAt())
                 .tokenExpiresAt(dto.tokenExpiresAt())
-                .passwordHash(dto.rawPassword()) // ✅ rawPassword trafi do pola passwordHash
+                .passwordHash(dto.rawPassword())
                 .build();
     }
 

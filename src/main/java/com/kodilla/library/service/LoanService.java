@@ -1,6 +1,12 @@
 package com.kodilla.library.service;
 
-import com.kodilla.library.exception.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.kodilla.library.exception.BookNotFoundByIdException;
+import com.kodilla.library.exception.LoanNotAllowedException;
+import com.kodilla.library.exception.LoanNotFoundByIdException;
+import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.model.Book;
 import com.kodilla.library.model.BookStatus;
 import com.kodilla.library.model.Loan;
@@ -8,12 +14,10 @@ import com.kodilla.library.model.User;
 import com.kodilla.library.repository.BookRepository;
 import com.kodilla.library.repository.LoanRepository;
 import com.kodilla.library.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

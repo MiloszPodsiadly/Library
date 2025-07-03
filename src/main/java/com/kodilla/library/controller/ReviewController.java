@@ -1,15 +1,25 @@
 package com.kodilla.library.controller;
 
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.kodilla.library.dto.ReviewDTO;
-import com.kodilla.library.exception.*;
+import com.kodilla.library.exception.BookNotFoundByIdException;
+import com.kodilla.library.exception.ReviewNotFoundByIdException;
+import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.mapper.ReviewMapper;
 import com.kodilla.library.model.Review;
 import com.kodilla.library.service.ReviewService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/reviews")
@@ -19,39 +29,35 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final ReviewMapper reviewMapper;
 
-    // ✅ POST /reviews?userId=...&bookId=...
     @PostMapping
     public ResponseEntity<ReviewDTO> addReview(
-            @RequestParam Long userId,
-            @RequestParam Long bookId,
+            @RequestParam Long idUser,
+            @RequestParam Long idBook,
             @RequestParam String comment,
             @RequestParam int rating
     ) throws BookNotFoundByIdException, UserNotFoundByIdException {
-        Review review = reviewService.addReview(userId, bookId, comment, rating);
+        Review review = reviewService.addReview(idUser, idBook, comment, rating);
         return ResponseEntity.ok(reviewMapper.toDto(review));
     }
 
-    // ✅ DELETE /reviews/{reviewId}
-    @DeleteMapping("/{reviewId}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId)
+    @DeleteMapping("/{idReview}")
+    public ResponseEntity<Void> deleteReview(@PathVariable Long idReview)
             throws ReviewNotFoundByIdException {
-        reviewService.deleteReview(reviewId);
+        reviewService.deleteReview(idReview);
         return ResponseEntity.noContent().build();
     }
 
-    // ✅ GET /reviews/book/{bookId}
-    @GetMapping("/book/{bookId}")
-    public ResponseEntity<List<ReviewDTO>> getReviewsForBook(@PathVariable Long bookId)
+    @GetMapping("/book/{idBook}")
+    public ResponseEntity<List<ReviewDTO>> getReviewsForBook(@PathVariable Long idBook)
             throws BookNotFoundByIdException {
-        List<Review> reviews = reviewService.getReviewsForBook(bookId);
+        List<Review> reviews = reviewService.getReviewsForBook(idBook);
         return ResponseEntity.ok(reviewMapper.toDtoList(reviews));
     }
 
-    // ✅ GET /reviews/user/{userId}
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReviewDTO>> getUserReviews(@PathVariable Long userId)
+    @GetMapping("/user/{idUser}")
+    public ResponseEntity<List<ReviewDTO>> getUserReviews(@PathVariable Long idUser)
             throws UserNotFoundByIdException {
-        List<Review> reviews = reviewService.getUserReviews(userId);
+        List<Review> reviews = reviewService.getUserReviews(idUser);
         return ResponseEntity.ok(reviewMapper.toDtoList(reviews));
     }
 }

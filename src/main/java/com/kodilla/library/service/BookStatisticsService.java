@@ -1,13 +1,20 @@
 package com.kodilla.library.service;
 
+import java.util.List;
+
 import com.kodilla.library.exception.BookNotFoundByIdException;
 import com.kodilla.library.model.Book;
-import com.kodilla.library.repository.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.kodilla.library.model.BookStatistics;
-import java.util.Comparator;
-import java.util.List;
+import com.kodilla.library.repository.BookRepository;
+import com.kodilla.library.repository.BookStatisticsRepository;
+import com.kodilla.library.repository.FavoriteBookRepository;
+import com.kodilla.library.repository.LoanRepository;
+import com.kodilla.library.repository.ReservationRepository;
+import com.kodilla.library.repository.ReviewRepository;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +69,7 @@ public class BookStatisticsService {
 
     public BookStatistics getStatisticsByBookId(Long idBook) {
         return bookStatisticsRepository.findByBook_IdBook(idBook)
-                .orElse(null); // lub orElseThrow, jeśli wymagane
+                .orElse(null);
     }
 
     public Long getReservationCountForBook(Long idBook) {
@@ -73,9 +80,10 @@ public class BookStatisticsService {
         return reviewRepository.findAverageRatingByBookId(idBook);
     }
 
-    public Long getFavoriteCountForBook(Long idBook) {
-        return favoriteBookRepository.countByBook_IdBook(idBook);
+    public String getFavoriteCountForBook(Long idBook) {
+        return "How many likes it has: " + favoriteBookRepository.countByBook_IdBook(idBook);
     }
+
 
     public Book getBookById(Long idBook) throws BookNotFoundByIdException {
         return bookRepository.findById(idBook)

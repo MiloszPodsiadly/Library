@@ -1,10 +1,12 @@
 package com.kodilla.library.security;
+
+import java.time.LocalDateTime;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import com.kodilla.library.model.User;
-import java.time.LocalDateTime;
 
+import com.kodilla.library.model.User;
 @Component
 public class AccessGuard {
 

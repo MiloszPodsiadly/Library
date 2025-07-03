@@ -1,14 +1,5 @@
 package com.kodilla.library.service;
 
-import com.kodilla.library.exception.FineNotFoundException;
-import com.kodilla.library.exception.UserNotFoundByIdException;
-import com.kodilla.library.model.Fine;
-import com.kodilla.library.model.User;
-import com.kodilla.library.repository.FineRepository;
-import com.kodilla.library.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +7,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.kodilla.library.exception.FineNotFoundException;
+import com.kodilla.library.exception.UserNotFoundByIdException;
+import com.kodilla.library.model.Fine;
+import com.kodilla.library.model.User;
+import com.kodilla.library.repository.FineRepository;
+import com.kodilla.library.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class FineService {

@@ -1,12 +1,14 @@
 package com.kodilla.library.mapper;
 
-import com.kodilla.library.dto.BookDTO;
-import com.kodilla.library.model.Book;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import com.kodilla.library.dto.BookDTO;
+import com.kodilla.library.model.Book;
+import com.kodilla.library.model.BookStatus;
 
 @Component
 public class BookMapper {
@@ -34,8 +36,8 @@ public class BookMapper {
                 .title(dto.title())
                 .author(dto.author())
                 .isbn(dto.isbn())
-                .available(dto.available())
-                .statuses(dto.statuses() != null ? dto.statuses() : Set.of())
+                .available(dto.available() != null ? dto.available() : true)
+                .statuses(dto.statuses() != null ? dto.statuses() : Set.of(BookStatus.AVAILABLE))
                 .build();
     }
 

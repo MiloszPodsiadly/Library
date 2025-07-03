@@ -1,5 +1,5 @@
 package com.kodilla.library.dto;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 
 public record ReservationDTO(
@@ -8,5 +8,6 @@ public record ReservationDTO(
         Long idBook,
         LocalDateTime reservationDate,
         Boolean active,
-        Integer reservationOrder
+        Integer reservationOrder,
+        Boolean unavailableNotificationSent
 ) {}

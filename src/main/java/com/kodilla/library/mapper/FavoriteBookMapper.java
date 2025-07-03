@@ -1,13 +1,14 @@
 package com.kodilla.library.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
 import com.kodilla.library.dto.FavoriteBookDTO;
 import com.kodilla.library.model.Book;
 import com.kodilla.library.model.FavoriteBook;
 import com.kodilla.library.model.User;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class FavoriteBookMapper {

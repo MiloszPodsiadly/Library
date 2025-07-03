@@ -1,5 +1,8 @@
 package com.kodilla.library.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.kodilla.library.exception.BookNotFoundByIdException;
 import com.kodilla.library.exception.FavoriteAlreadyExistsException;
 import com.kodilla.library.exception.FavoriteNotFoundException;
@@ -10,12 +13,10 @@ import com.kodilla.library.model.User;
 import com.kodilla.library.repository.BookRepository;
 import com.kodilla.library.repository.FavoriteBookRepository;
 import com.kodilla.library.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

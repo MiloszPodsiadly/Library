@@ -1,12 +1,13 @@
 package com.kodilla.library.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
 import com.kodilla.library.dto.FineDTO;
 import com.kodilla.library.model.Fine;
 import com.kodilla.library.model.Loan;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class FineMapper {

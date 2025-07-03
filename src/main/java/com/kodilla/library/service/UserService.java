@@ -1,18 +1,21 @@
 package com.kodilla.library.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.exception.UserNotFoundByMailException;
+import com.kodilla.library.jwt.JwtService;
 import com.kodilla.library.model.User;
 import com.kodilla.library.repository.UserRepository;
 import com.kodilla.library.security.AccessGuard;
-import com.kodilla.library.jwt.JwtService;
+
 import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +42,8 @@ public class UserService {
 
     @Transactional
     public User createUser(User user) {
-        user.setIdUser(null); // ✅ wymuszenie INSERT
-
+        user.setIdUser(null);
         String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
-
         User newUser = User.builder()
                 .name(user.getName())
                 .email(user.getEmail())
@@ -72,7 +73,7 @@ public class UserService {
         }
 
         User modifiedUser = User.builder()
-                .idUser(existing.getIdUser()) // klucz ID
+                .idUser(existing.getIdUser())
                 .name(updated.getName() != null ? updated.getName() : existing.getName())
                 .email(updated.getEmail() != null ? updated.getEmail() : existing.getEmail())
                 .passwordHash(newPasswordHash)
@@ -93,11 +94,9 @@ public class UserService {
         if (!accessGuard.checkOwner(idUser)) {
             throw new SecurityException("Unauthorized access.");
         }
-
         if (!userRepository.existsById(idUser)) {
             throw new UserNotFoundByIdException(idUser);
         }
-
         userRepository.deleteById(idUser);
     }
 

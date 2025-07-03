@@ -1,4 +1,5 @@
 package com.kodilla.library.dto;
+
 import java.time.LocalDateTime;
 public record UserDTO(
         String name,
@@ -7,7 +8,7 @@ public record UserDTO(
         String token,
         LocalDateTime tokenCreatedAt,
         LocalDateTime tokenExpiresAt,
-        String rawPassword // ✅ DODANE
+        String rawPassword
 ) {}
 
 

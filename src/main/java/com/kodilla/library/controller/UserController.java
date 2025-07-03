@@ -1,15 +1,26 @@
 package com.kodilla.library.controller;
 
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.kodilla.library.dto.UserDTO;
-import com.kodilla.library.exception.*;
+import com.kodilla.library.exception.UserNotFoundByMailException;
+import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.mapper.UserMapper;
 import com.kodilla.library.model.User;
 import com.kodilla.library.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,18 +30,16 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    // ✅ GET /users
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(userMapper.toDtoList(users));
     }
 
-    // ✅ GET /users/{id}
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id)
+    @GetMapping("/{idUser}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long idUser)
             throws UserNotFoundByIdException {
-        User user = userService.getUserById(id);
+        User user = userService.getUserById(idUser);
         return ResponseEntity.ok(userMapper.toDto(user));
     }
 
@@ -41,35 +50,27 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDto(saved));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{idUser}")
     public ResponseEntity<UserDTO> updateUser(
-            @PathVariable Long id,
+            @PathVariable Long idUser,
             @RequestBody UserDTO dto
     ) throws UserNotFoundByIdException {
-
         User updatedUser = userMapper.toEntity(dto);
-
-        // Nadpisujemy ID z URL
-        updatedUser.setIdUser(id);
-
-        // Cała logika walidacji i haszowania jest w serwisie
+        updatedUser.setIdUser(idUser);
         User saved = userService.updateUser(updatedUser);
-
         return ResponseEntity.ok(userMapper.toDto(saved));
     }
 
-    // ✅ DELETE /users/{id}
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idUser}")
     public ResponseEntity<Void> deleteUser(
-            @PathVariable Long id,
+            @PathVariable Long idUser,
             @RequestBody UserDTO authUserDto
     ) throws UserNotFoundByIdException {
-        User authUser = userMapper.toEntity(authUserDto); // lub odczytaj z JWT jeśli masz
-        userService.deleteUser(id, authUser);
+        User authUser = userMapper.toEntity(authUserDto);
+        userService.deleteUser(idUser, authUser);
         return ResponseEntity.noContent().build();
     }
 
-    // ✅ POST /users/token (logowanie i token)
     @PostMapping("/token")
     public ResponseEntity<UserDTO> generateToken(
             @RequestParam String email,

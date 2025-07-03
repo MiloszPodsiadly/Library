@@ -1,5 +1,14 @@
 package com.kodilla.library.model;
-import jakarta.persistence.*;
+
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,17 +24,17 @@ public class BookStatistics {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idBook;
+    private Long idBookStatistics;
 
     @OneToOne
     @JoinColumn(name = "idBook")
     private Book book;
 
     @Builder.Default
-    private Long loanCount = 0L;
+    private Long loanCount = 1L;
 
     @Builder.Default
-    private Long reservationCount = 0L;
+    private Long reservationCount = 1L;
 
     @Builder.Default
     private Double averageRating = 0.0;

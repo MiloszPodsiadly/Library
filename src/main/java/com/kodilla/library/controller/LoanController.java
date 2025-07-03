@@ -1,15 +1,26 @@
 package com.kodilla.library.controller;
 
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.kodilla.library.dto.LoanDTO;
-import com.kodilla.library.exception.*;
+import com.kodilla.library.exception.BookNotFoundByIdException;
+import com.kodilla.library.exception.LoanNotAllowedException;
+import com.kodilla.library.exception.LoanNotFoundByIdException;
+import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.mapper.LoanMapper;
 import com.kodilla.library.model.Loan;
 import com.kodilla.library.service.LoanService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/loans")
@@ -19,39 +30,34 @@ public class LoanController {
     private final LoanService loanService;
     private final LoanMapper loanMapper;
 
-    // ✅ POST /loans?userId=&bookId=
     @PostMapping
-    public ResponseEntity<LoanDTO> loanBook(@RequestParam Long userId, @RequestParam Long bookId)
+    public ResponseEntity<LoanDTO> loanBook(@RequestParam Long idUser, @RequestParam Long idBook)
             throws UserNotFoundByIdException, BookNotFoundByIdException, LoanNotAllowedException {
-        Loan loan = loanService.loanBook(userId, bookId);
+        Loan loan = loanService.loanBook(idUser, idBook);
         return ResponseEntity.ok(loanMapper.toDto(loan));
     }
 
-    // ✅ PUT /loans/{loanId}/return
-    @PutMapping("/{loanId}/return")
-    public ResponseEntity<LoanDTO> returnBook(@PathVariable Long loanId)
+    @PutMapping("/{idLoan}/return")
+    public ResponseEntity<LoanDTO> returnBook(@PathVariable Long idLoan)
             throws LoanNotFoundByIdException {
-        Loan loan = loanService.returnBook(loanId);
+        Loan loan = loanService.returnBook(idLoan);
         return ResponseEntity.ok(loanMapper.toDto(loan));
     }
 
-    // ✅ PUT /loans/{loanId}/extend
-    @PutMapping("/{loanId}/extend")
-    public ResponseEntity<LoanDTO> extendLoan(@PathVariable Long loanId)
+    @PutMapping("/{idLoan}/extend")
+    public ResponseEntity<LoanDTO> extendLoan(@PathVariable Long idLoan)
             throws LoanNotFoundByIdException, LoanNotAllowedException {
-        Loan loan = loanService.extendLoan(loanId);
+        Loan loan = loanService.extendLoan(idLoan);
         return ResponseEntity.ok(loanMapper.toDto(loan));
     }
 
-    // ✅ GET /loans/user/{userId}
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<LoanDTO>> getLoansByUser(@PathVariable Long userId)
+    @GetMapping("/user/{idUser}")
+    public ResponseEntity<List<LoanDTO>> getLoansByUser(@PathVariable Long idUser)
             throws UserNotFoundByIdException {
-        List<Loan> loans = loanService.getLoansByUser(userId);
+        List<Loan> loans = loanService.getLoansByUser(idUser);
         return ResponseEntity.ok(loanMapper.toDtoList(loans));
     }
 
-    // ✅ GET /loans/active
     @GetMapping("/active")
     public ResponseEntity<List<LoanDTO>> getActiveLoans() {
         List<Loan> loans = loanService.getActiveLoans();

@@ -1,11 +1,12 @@
 package com.kodilla.library.mapper;
 
-import com.kodilla.library.dto.BookStatisticsDTO;
-import com.kodilla.library.model.BookStatistics;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import com.kodilla.library.dto.BookStatisticsDTO;
+import com.kodilla.library.model.BookStatistics;
 
 @Component
 public class BookStatisticsMapper {

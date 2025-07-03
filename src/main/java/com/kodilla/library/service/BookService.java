@@ -1,16 +1,15 @@
 package com.kodilla.library.service;
 
+import java.util.List;
+
 import com.kodilla.library.exception.BookNotFoundByIdException;
 import com.kodilla.library.model.Book;
 import com.kodilla.library.repository.BookRepository;
-import com.kodilla.library.model.Loan;
-import com.kodilla.library.model.Reservation;
-import com.kodilla.library.model.Review;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +25,14 @@ public class BookService {
         return bookRepository.findById(idBook)
                 .orElseThrow(() -> new BookNotFoundByIdException(idBook));
     }
+    public List<Book> searchByTitle(String keyword) {
+        return bookRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+
+    public List<Book> searchByAuthor(String keyword) {
+        return bookRepository.findByAuthorContainingIgnoreCase(keyword);
+    }
+
 
     public Book addBook(Book book) {
         return bookRepository.save(book);

@@ -1,6 +1,8 @@
 package com.kodilla.library.dto;
-import com.kodilla.library.model.BookStatus;
+
 import java.util.Set;
+
+import com.kodilla.library.model.BookStatus;
 public record BookDTO(
         Long idBook,
         String title,

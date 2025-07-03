@@ -1,19 +1,21 @@
 package com.kodilla.library.jwt;
 
-import com.kodilla.library.model.User;
-import com.kodilla.library.repository.UserRepository;
+import java.io.IOException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import com.kodilla.library.model.User;
+import com.kodilla.library.repository.UserRepository;
 
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -43,10 +45,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        Long userId = jwtService.extractUserId(token);
+        Long idUser = jwtService.extractUserId(token);
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findById(userId).orElse(null);
+            User user = userRepository.findByIdUser(idUser).orElse(null);
             if (user != null) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         user, null, null // no roles
