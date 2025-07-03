@@ -1,0 +1,38 @@
+services:
+  app:
+    build: .
+    container_name: library-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: kodilla_user
+      SPRING_DATASOURCE_PASSWORD: kodilla_password
+      JWT_SECRET: superTajnyKluczJWT12345678901234567890
+    networks:
+      - library-network
+
+
+  mysql:
+    image: mysql:8.0
+    container_name: library-mysql
+    environment:
+      MYSQL_DATABASE: kodilla_library
+      MYSQL_USER: kodilla_user
+      MYSQL_PASSWORD: kodilla_password
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    networks:
+      - library-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+networks:
+  library-network:
+
+volumes:
+  mysql-data:

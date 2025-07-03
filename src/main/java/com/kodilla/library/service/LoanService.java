@@ -161,16 +161,16 @@ public class LoanService {
     public void markReservedBooksAfterLoanEnd() {
 
         List<Book> availableBooks = bookRepository.findAll().stream()
-                .filter(Book::getAvailable)
+                .filter(book -> Boolean.TRUE.equals(book.getAvailable()))
                 .toList();
 
         for (Book book : availableBooks) {
             boolean hasActiveReservation = reservationRepository
                     .findAllByBook_IdBook(book.getIdBook())
                     .stream()
-                    .anyMatch(Reservation::getActive);
+                    .anyMatch(r -> Boolean.TRUE.equals(r.getActive()));
 
-            if (hasActiveReservation) {
+        if (hasActiveReservation) {
                 book.setAvailable(false);
                 book.getStatuses().clear();
                 book.getStatuses().add(BookStatus.RESERVED);

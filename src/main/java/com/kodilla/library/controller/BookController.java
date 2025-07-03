@@ -55,8 +55,6 @@ public class BookController {
         return ResponseEntity.ok(bookMapper.toDtoList(books));
     }
 
-
-
     @PostMapping
     public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO bookDTO) {
         Book savedBook = bookService.addBook(bookMapper.toEntity(bookDTO));

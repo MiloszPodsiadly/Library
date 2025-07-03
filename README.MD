@@ -1,291 +1,305 @@
 # 📚 Library Management System – Backend API
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/your-org/library-backend/actions) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+&#x20;
 
-Comprehensive, production-ready RESTful API for an online library, built with Spring Boot and Java. Provides endpoints for managing users, books, loans, reservations, reviews, favorites, fines and statistics.
-
----
-
-## Table of Contents
-
-1. [Features](#features)  
-2. [Tech Stack](#tech-stack)  
-3. [Prerequisites](#prerequisites)  
-4. [Installation](#installation)  
-5. [Configuration](#configuration)  
-6. [Running the Application](#running-the-application)  
-7. [API Documentation](#api-documentation)  
-   - [Authentication](#authentication)  
-   - [Users](#users)  
-   - [Books](#books)  
-   - [Book Statistics](#book-statistics)  
-   - [Loans](#loans)  
-   - [Reservations](#reservations)  
-   - [Favorites](#favorites)  
-   - [Reviews](#reviews)  
-   - [Fines](#fines)  
-8. [Contributing](#contributing)  
-9. [License](#license)  
-10. [Contact](#contact)  
+Comprehensive, production-ready RESTful API for an online library, built with Spring Boot and Java. Provides endpoints for managing users, books, loans, reservations, reviews, favorites, fines, and statistics.
 
 ---
 
-## Features
+## ✨ Features
 
-- 🔐 **JWT-based Authentication & Authorization**  
-- 👥 **User Management** (registration, update, deletion)  
-- 📚 **Book Catalog** (CRUD operations)  
-- 📈 **Book Statistics** (top-loaned, top-reserved, average rating, etc.)  
-- 📦 **Loan Management** (borrow, return, extend)  
-- 📅 **Reservation System**  
-- ⭐ **Favorites** (add/remove/list)  
-- 📝 **Reviews & Ratings**  
-- 💰 **Fines** (issue & payment)  
-- ⚙️ **Exception Handling** with consistent JSON error responses  
-- 📖 **DTO + Mapper** pattern for clear separation of layers  
-
----
-
-## Tech Stack
-
-- **Java 17**  
-- **Spring Boot 3.x** (Web, Data JPA, Security)  
-- **Hibernate** ORM  
-- **MySQL 8+** (or H2 for testing)  
-- **Lombok**  
-- **MapStruct** (DTO mapping)  
-- **JUnit 5 & Mockito** (unit/integration tests)  
-- **Docker & Docker-Compose**  
+- 🔐 **JWT-based Authentication & Authorization**
+- 👥 **User Management** (registration, update, deletion)
+- 📚 **Book Catalog** (CRUD + search by title/author)
+- 📊 **Book Statistics** (top-loaned, top-reserved, average rating, etc.)
+- 📦 **Loan Management** (borrow, return, extend)
+- 🗓️ **Reservation System**
+- ⭐ **Favorites** (add/remove/list)
+- 📝 **Reviews & Ratings**
+- 💰 **Fines** (issue & payment)
+- ⚙️ **Exception Handling** with consistent JSON error responses
+- 📖 **DTO + Mapper** pattern for clean architecture
 
 ---
 
-## Prerequisites
+## 📊 Tech Stack
 
-- JDK 17 or higher  
-- Maven 3.8+  
-- MySQL 8+ (or Docker)  
-- (Optional) Docker & Docker-Compose  
+- **Java 17**
+- **Spring Boot 3.x**
+- **Hibernate** / JPA
+- **MySQL 8+** (or H2 for testing)
+- **MapStruct**
+- **Lombok**
+- **JUnit 5 & Mockito**
+- **Docker & Docker-Compose**
 
 ---
 
-## Installation
+## 🚪 Prerequisites
+
+- JDK 17+
+- Maven 3.8+
+- MySQL 8+
+- Docker & Docker Compose (optional)
+
+---
+
+## 📖 Installation
 
 ```bash
-git clone https://github.com/your-org/library-backend.git
-cd library-backend
-Configure database (see Configuration).
+git clone https://github.com/MiloszPodsiadly/Library.git
+cd Library
+```
 
-Build the project
+Configure database connection in `src/main/resources/application.yml`.
 
-bash
-Kopiuj
-Edytuj
-mvn clean install -DskipTests
-Configuration
-Create src/main/resources/application.yml with your environment settings:
+Build the project:
 
-yaml
-Kopiuj
-Edytuj
+```bash
+gradle clean build
+```
+---
+
+## ⚖️ Configuration
+
+Sample `docker-compose.yml` for local development:
+```yml
+services:
+  app:
+    build: .
+    container_name: library-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: kodilla_user
+      SPRING_DATASOURCE_PASSWORD: kodilla_password
+      JWT_SECRET: superTajnyKluczJWT12345678901234567890
+    networks:
+      - library-network
+
+
+  mysql:
+    image: mysql:8.0
+    container_name: library-mysql
+    environment:
+      MYSQL_DATABASE: kodilla_library
+      MYSQL_USER: kodilla_user
+      MYSQL_PASSWORD: kodilla_password
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    networks:
+      - library-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+networks:
+  library-network:
+
+volumes:
+  mysql-data:
+
+
+```
+Sample `application.yaml` for local development:
+```yml
 spring:
+  profiles:
+    active: dev
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
   datasource:
-    url: jdbc:mysql://localhost:3306/library_db?useSSL=false&serverTimezone=UTC
-    username: root
-    password: password123
+    url: jdbc:mysql://localhost:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
+    username: kodilla_user
+    password: kodilla_password
+
+jwt:
+  secret: superTajnyKluczJWT12345678901234567890
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
+    username: kodilla_user
+    password: kodilla_password
+
   jpa:
+    database: mysql
     hibernate:
       ddl-auto: update
     show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+logging:
+  level:
+    root: ERROR
+    org.springframework: INFO
+    org.hibernate: ERROR
+    org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration: ERROR
+    org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration: ERROR
+
+debug: false
 
 jwt:
-  secret: VerySecretKey12345
-  expiration-ms: 3600000
+  secret: superTajnyKluczJWT12345678901234567890
+```
 
-server:
-  port: 8080
-Note: For production, inject sensitive values via environment variables or a secrets manager.
+---
 
-Running the Application
-Locally
-bash
-Kopiuj
-Edytuj
-mvn spring-boot:run
-With Docker
-bash
-Kopiuj
-Edytuj
+## 🚀 Running the Application
+
+```bash
 docker-compose up --build
-Once started, the API will be available at:
+```
+```bash
+gradle bootRun
+```
+```bash
+LibraryApplication <-- with method main class
+```
+API will be available at: `http://localhost:8080/api/v1`
 
-bash
-Kopiuj
-Edytuj
-http://localhost:8080/api/v1
-API Documentation
-All endpoints that modify state require a valid JWT in the Authorization header:
+---
 
-makefile
-Kopiuj
-Edytuj
-Authorization: Bearer <token>
-Authentication
-Generate JWT
-http
-Kopiuj
-Edytuj
-POST /api/v1/users/token?email={email}&password={password}
-Request Params
+## 📃 API Documentation
 
-email (string)
+### 🔐 Authentication
 
-password (string)
+**POST** `/api/v1/users/token?email={email}&password={password}`
 
-Response
+- Generate JWT token
+- Response:
+  ```json
+  {
+    "idUser": 1,
+    "email": "john.doe@example.com",
+    "name": "John",
+    "surname": "Doe",
+    "token": "eyJhbGciOi..."
+  }
+  ```
 
-json
-Kopiuj
-Edytuj
-{
-  "idUser": 1,
-  "email": "john.doe@example.com",
-  "name": "John",
-  "surname": "Doe",
-  "token": "eyJhbGciOiJIUzUxMiJ9..."
-}
-Users
-Method	Endpoint	Description
-POST	/users	Register a new user
-GET	/users	List all users
-GET	/users/{id}	Get user by ID
-PUT	/users/{id}	Update user
-DELETE	/users/{id}	Delete user (auth required)
+### 👤 Users
 
-Register Example
+| Method | Endpoint      | Description         |
+| ------ | ------------- | ------------------- |
+| POST   | `/users`      | Register a new user |
+| GET    | `/users`      | List all users      |
+| GET    | `/users/{id}` | Get user by ID      |
+| PUT    | `/users/{id}` | Update user         |
+| DELETE | `/users/{id}` | Delete user         |
 
-http
-Kopiuj
-Edytuj
-POST /api/v1/users
-Content-Type: application/json
+### 📚 Books
 
-{
-  "email": "jane.doe@example.com",
-  "name": "Jane",
-  "surname": "Doe"
-}
-json
-Kopiuj
-Edytuj
-{
-  "idUser": 2,
-  "email": "jane.doe@example.com",
-  "name": "Jane",
-  "surname": "Doe",
-  "token": "..."
-}
-Books
-Method	Endpoint	Description
-GET	/books	List all books
-GET	/books/{id}	Get book by ID
-POST	/books	Add a new book
-PUT	/books/{id}	Update book
-DELETE	/books/{id}	Delete book
+| Method | Endpoint               | Description            |
+| ------ | ---------------------- | ---------------------- |
+| GET    | `/books`               | List all books         |
+| GET    | `/books/{id}`          | Get book by ID         |
+| GET    | `/books/search/title`  | Search books by title  |
+| GET    | `/books/search/author` | Search books by author |
+| POST   | `/books`               | Add new book           |
+| PUT    | `/books/{id}`          | Update book            |
+| DELETE | `/books/{id}`          | Delete book            |
 
-Add Book Example
+### 📊 Book Statistics
 
-http
-Kopiuj
-Edytuj
-POST /api/v1/books
-Content-Type: application/json
-Authorization: Bearer <token>
+| Method | Endpoint                              | Description                  |
+| ------ | ------------------------------------- | ---------------------------- |
+| GET    | `/books/statistics/{id}`              | Get stats for one book       |
+| GET    | `/books/statistics/top-loaned`        | Top 10 most loaned books     |
+| GET    | `/books/statistics/top-reserved`      | Top 3 most reserved books    |
+| GET    | `/books/statistics/top-favorite`      | Top 3 most favorited books   |
+| GET    | `/books/statistics/{id}/loans`        | Loan count for one book      |
+| GET    | `/books/statistics/{id}/reservations` | Reservation count for a book |
+| GET    | `/books/statistics/{id}/rating`       | Average rating of a book     |
+| GET    | `/books/statistics/{id}/favorites`    | Favorite count for a book    |
 
-{
-  "title": "Clean Code",
-  "author": "Robert C. Martin",
-  "publicationYear": 2008
-}
-json
-Kopiuj
-Edytuj
-{
-  "idBook": 10,
-  "title": "Clean Code",
-  "author": "Robert C. Martin",
-  "publicationYear": 2008
-}
-Book Statistics
-Method	Endpoint	Description
-GET	/books/statistics/{id}	Stats for a single book
-GET	/books/statistics/top-loaned	Top 10 most loaned
-GET	/books/statistics/top-reserved	Top 3 most reserved
-GET	/books/statistics/top-favorite	Top 3 most favorited
-GET	/books/statistics/{id}/loans	Loan count for one book
-GET	/books/statistics/{id}/reservations	Reservation count for one book
-GET	/books/statistics/{id}/rating	Average rating
-GET	/books/statistics/{id}/favorites	Favorite count
+### ⭐ Favorites
 
-Loans
-Method	Endpoint	Description
-POST	/loans?userId={uid}&bookId={bid}	Create a new loan
-PUT	/loans/{loanId}/return	Return a borrowed book
-PUT	/loans/{loanId}/extend	Extend a loan
-GET	/loans/user/{userId}	List loans by user
-GET	/loans/active	List active loans
+| Method | Endpoint                               | Description           |
+| ------ | -------------------------------------- | --------------------- |
+| GET    | `/favorites/user/{userId}`             | List user's favorites |
+| POST   | `/favorites?idUser={uid}&idBook={bid}` | Add book to favorites |
+| DELETE | `/favorites?idUser={uid}&idBook={bid}` | Remove from favorites |
 
-Reservations
-Method	Endpoint	Description
-POST	/reservations?userId={uid}&bookId={bid}	Create a reservation
-DELETE	/reservations/{id}	Cancel a reservation
-GET	/reservations/user/{userId}	List user’s reservations
-GET	/reservations/book/{bookId}	List reservations for a book
+### 📕 Reviews
 
-Favorites
-Method	Endpoint	Description
-GET	/favorites/user/{userId}	List user’s favorites
-POST	/favorites?userId={uid}&bookId={bid}	Add to favorites
-DELETE	/favorites?userId={uid}&bookId={bid}	Remove from favorites
+| Method | Endpoint                                                    | Description             |
+| ------ | ----------------------------------------------------------- | ----------------------- |
+| POST   | `/reviews?idUser={uid}&idBook={bid}&comment={c}&rating={r}` | Create a review         |
+| DELETE | `/reviews/{id}`                                             | Delete a review         |
+| GET    | `/reviews/book/{bookId}`                                    | List reviews for a book |
+| GET    | `/reviews/user/{userId}`                                    | List reviews by a user  |
 
-Reviews
-Method	Endpoint	Description
-POST	/reviews?userId={uid}&bookId={bid}&comment={c}&rating={r}	Create a review
-DELETE	/reviews/{reviewId}	Delete a review
-GET	/reviews/book/{bookId}	List reviews for a book
-GET	/reviews/user/{userId}	List reviews by a user
+### 📦 Loans
 
-Fines
-Method	Endpoint	Description
-GET	/fines/user/{userId}	List fines for a user
-POST	/fines?userId={uid}&reason={reason}	Issue a new fine
-PUT	/fines/{fineId}/pay	Mark a fine as paid
+| Method | Endpoint                           | Description          |
+| ------ | ---------------------------------- | -------------------- |
+| POST   | `/loans?idUser={uid}&idBook={bid}` | Create a new loan    |
+| PUT    | `/loans/{loanId}/return`           | Return borrowed book |
+| PUT    | `/loans/{loanId}/extend`           | Extend a loan        |
+| GET    | `/loans/user/{userId}`             | List loans by user   |
+| GET    | `/loans/active`                    | List active loans    |
 
-Contributing
-Fork the repository
+### 🗓️ Reservations
 
-Create a feature branch: git checkout -b feature/YourFeature
+| Method | Endpoint                                  | Description               |
+| ------ | ----------------------------------------- | ------------------------- |
+| POST   | `/reservations?idUser={uid}&idBook={bid}` | Create a reservation      |
+| DELETE | `/reservations/{id}`                      | Cancel a reservation      |
+| DELETE | `/reservations/delete/{id}`               | Delete a reservation      |
+| GET    | `/reservations/user/{userId}`             | List reservations by user |
+| GET    | `/reservations/book/{bookId}`             | List reservations by book |
 
-Commit your changes: git commit -m 'Add some feature'
+### 💳 Fines
 
-Push to your branch: git push origin feature/YourFeature
+| Method | Endpoint                              | Description         |
+| ------ | ------------------------------------- | ------------------- |
+| GET    | `/fines/user/{userId}`                | List fines for user |
+| POST   | `/fines?idUser={uid}&reason={reason}` | Issue a new fine    |
+| PUT    | `/fines/{fineId}/pay`                 | Mark a fine as paid |
 
-Open a Pull Request
+---
 
-Please follow the Contributor Covenant code of conduct.
+## 🙌 Contributing
 
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature/YourFeature`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to your branch: `git push origin feature/YourFeature`
+5. Open a Pull Request
 
-Contact
-Project Maintainer:
+Please follow the [Contributor Covenant](https://www.contributor-covenant.org/) code of conduct.
 
-Name: Jane Developer
+---
 
-Email: jane.dev@example.com
+## 📚 License
 
-GitHub: github.com/your-org/library-backend
+This project is licensed under the [MIT License](LICENSE).
 
-Maintained with ❤️ by Your Org
+---
 
-Kopiuj
-Edytuj
+## 💎 Contact
+
+**Project Maintainer:**
+
+- **Name:** Milosz Podsiadly
+- **Email:** [m.podsiadly99@gmail.com]
+- **GitHub:** [https://github.com/MiloszPodsiadly/Library](https://github.com/MiloszPodsiadly/Library.git)
+
+Maintained with ❤️ 
+

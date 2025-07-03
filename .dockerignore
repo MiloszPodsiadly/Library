@@ -1,0 +1,6 @@
+.git
+.idea
+*.iml
+build
+out
+node_modules
