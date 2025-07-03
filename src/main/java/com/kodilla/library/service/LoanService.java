@@ -10,14 +10,17 @@ import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.model.Book;
 import com.kodilla.library.model.BookStatus;
 import com.kodilla.library.model.Loan;
+import com.kodilla.library.model.Reservation;
 import com.kodilla.library.model.User;
 import com.kodilla.library.repository.BookRepository;
 import com.kodilla.library.repository.LoanRepository;
+import com.kodilla.library.repository.ReservationRepository;
 import com.kodilla.library.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class LoanService {
     private final LoanRepository loanRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final ReservationRepository reservationRepository; // Dodane
 
     public Loan loanBook(Long idUser, Long idBook)
             throws UserNotFoundByIdException, BookNotFoundByIdException, LoanNotAllowedException {
@@ -36,51 +40,43 @@ public class LoanService {
         Book book = bookRepository.findById(idBook)
                 .orElseThrow(() -> new BookNotFoundByIdException(idBook));
 
-        if (!book.getAvailable()) {
-            throw new LoanNotAllowedException("Book is not available.");
-        }
+        Reservation reservation = reservationRepository
+                .findAllByBook_IdBook(idBook)
+                .stream()
+                .filter(r -> r.getUser().getIdUser().equals(idUser))
+                .filter(Reservation::getActive)
+                .findFirst()
+                .orElseThrow(() -> new LoanNotAllowedException("No active reservation found for this user and book."));
 
-        if (book.getStatuses().contains(BookStatus.RESERVED)) {
-            throw new LoanNotAllowedException("Book is currently reserved.");
+        LocalDateTime now = LocalDateTime.now();
+
+        if (now.isBefore(reservation.getStartDate()) || now.isAfter(reservation.getEndDate())) {
+            throw new LoanNotAllowedException("You can only loan the book during your reservation window: " +
+                    reservation.getStartDate() + " to " + reservation.getEndDate());
         }
 
         long activeLoans = loanRepository.countByUser_IdUserAndReturnedFalse(idUser);
-        if (activeLoans >= 2) {
-            throw new LoanNotAllowedException("User has reached maximum of 2 active loans.");
+        if (activeLoans >= 3) {
+            throw new LoanNotAllowedException("User has reached maximum of 3 active loans.");
         }
 
         Loan loan = Loan.builder()
                 .user(user)
                 .book(book)
-                .loanDate(LocalDateTime.now())
-                .returnDate(LocalDateTime.now().plusWeeks(2))
+                .loanDate(now)
+                .returnDate(now.plusHours(6))
                 .returned(false)
                 .extensionCount(0)
                 .build();
 
         book.setAvailable(false);
+        book.getStatuses().clear();
+        book.getStatuses().add(BookStatus.LOANED);
         bookRepository.save(book);
 
         return loanRepository.save(loan);
     }
 
-    public Loan returnBook(Long idLoan) throws LoanNotFoundByIdException {
-        Loan loan = loanRepository.findById(idLoan)
-                .orElseThrow(() -> new LoanNotFoundByIdException(idLoan));
-
-        if (loan.getReturned()) {
-            return loan; // już zwrócona
-        }
-
-        loan.setReturned(true);
-        loan.setReturnDate(LocalDateTime.now());
-
-        Book book = loan.getBook();
-        book.setAvailable(true);
-        bookRepository.save(book);
-
-        return loanRepository.save(loan);
-    }
 
     public List<Loan> getLoansByUser(Long idUser) throws UserNotFoundByIdException {
         if (!userRepository.existsById(idUser)) {
@@ -101,6 +97,10 @@ public class LoanService {
             throw new LoanNotAllowedException("Cannot extend a returned loan.");
         }
 
+        if (LocalDateTime.now().isAfter(loan.getReturnDate())) {
+            throw new LoanNotAllowedException("Cannot extend a loan that has already expired.");
+        }
+
         Book book = loan.getBook();
         if (book.getStatuses().contains(BookStatus.RESERVED)) {
             throw new LoanNotAllowedException("Cannot extend loan: book is reserved.");
@@ -110,10 +110,54 @@ public class LoanService {
             throw new LoanNotAllowedException("Loan has already been extended.");
         }
 
-        loan.setReturnDate(loan.getReturnDate().plusWeeks(1));
+        loan.setReturnDate(loan.getReturnDate().plusHours(6));
         loan.setExtensionCount(loan.getExtensionCount() + 1);
 
         return loanRepository.save(loan);
     }
-}
 
+
+    @Scheduled(fixedRate = 5 * 60 * 1000)
+    public void expireOldLoans() {
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Loan> expiredLoans = loanRepository.findByReturnedFalse()
+                .stream()
+                .filter(loan -> loan.getReturnDate().isBefore(now))
+                .toList();
+
+        for (Loan loan : expiredLoans) {
+            loan.setReturned(true);
+            loanRepository.save(loan);
+
+            Book book = loan.getBook();
+            book.setAvailable(true);
+            book.getStatuses().clear();
+            book.getStatuses().add(BookStatus.AVAILABLE);
+            bookRepository.save(book);
+        }
+    }
+
+    @Scheduled(fixedRate = 60 * 1000)
+    public void markReservedBooksAfterLoanEnd() {
+
+        List<Book> availableBooks = bookRepository.findAll().stream()
+                .filter(Book::getAvailable)
+                .toList();
+
+        for (Book book : availableBooks) {
+            boolean hasActiveReservation = reservationRepository
+                    .findAllByBook_IdBook(book.getIdBook())
+                    .stream()
+                    .anyMatch(Reservation::getActive);
+
+            if (hasActiveReservation) {
+                book.setAvailable(false);
+                book.getStatuses().clear();
+                book.getStatuses().add(BookStatus.RESERVED);
+                bookRepository.save(book);
+            }
+        }
+    }
+
+}
