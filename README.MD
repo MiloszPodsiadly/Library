@@ -62,6 +62,85 @@ gradle clean build
 
 ## ⚖️ Configuration
 
+Sample `application.yml` for local development:
+```yml
+spring:
+  profiles:
+    active: dev
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
+    username: kodilla_user
+    password: kodilla_password
+
+jwt:
+  secret: superTajnyKluczJWT12345678901234567890
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
+    username: kodilla_user
+    password: kodilla_password
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+logging:
+  level:
+    root: ERROR
+    org.springframework: INFO
+    org.hibernate: ERROR
+    org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration: ERROR
+    org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration: ERROR
+
+debug: false
+
+jwt:
+  secret: superTajnyKluczJWT12345678901234567890
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+    show-sql: false
+
+jwt:
+  secret: test-secret-key
+```
 Sample `docker-compose.yml` for local development:
 ```yml
 services:
@@ -102,60 +181,6 @@ networks:
 
 volumes:
   mysql-data:
-
-
-```
-Sample `application.yaml` for local development:
-```yml
-spring:
-  profiles:
-    active: dev
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
-    username: kodilla_user
-    password: kodilla_password
-
-jwt:
-  secret: superTajnyKluczJWT12345678901234567890
----
-spring:
-  config:
-    activate:
-      on-profile: docker
-
-  datasource:
-    url: jdbc:mysql://mysql:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
-    username: kodilla_user
-    password: kodilla_password
-
-  jpa:
-    database: mysql
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: false
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-
-logging:
-  level:
-    root: ERROR
-    org.springframework: INFO
-    org.hibernate: ERROR
-    org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration: ERROR
-    org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration: ERROR
-
-debug: false
-
-jwt:
-  secret: superTajnyKluczJWT12345678901234567890
 ```
 
 ---

@@ -40,8 +40,9 @@ public class Reservation {
     @Column(name = "reservation_date")
     private LocalDateTime reservationDate;
 
+    @Builder.Default
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder.Default
     @Setter
