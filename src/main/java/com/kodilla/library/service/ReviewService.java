@@ -32,24 +32,29 @@ public class ReviewService {
         return reviewRepository.findByBook_IdBook(idBook);
     }
 
-    public Review addReview(Long idUser, Long idBook, String comment, int rating)
-            throws BookNotFoundByIdException, UserNotFoundByIdException {
+    public Review addReview(Long userId, Long bookId, String comment, Integer rating) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundByIdException(userId));
 
-        Book book = bookRepository.findById(idBook)
-                .orElseThrow(() -> new BookNotFoundByIdException(idBook));
-        User user = userRepository.findById(idUser)
-                .orElseThrow(() -> new UserNotFoundByIdException(idUser));
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundByIdException(bookId));
+
+        boolean alreadyReviewed = reviewRepository.existsByUser_IdUserAndBook_IdBook(userId, bookId);
+        if (alreadyReviewed) {
+            throw new IllegalStateException("User has already submitted a review for this book.");
+        }
 
         Review review = Review.builder()
-                .book(book)
                 .user(user)
-                .rating(rating)
+                .book(book)
                 .comment(comment)
+                .rating(rating)
                 .createdAt(LocalDateTime.now())
                 .build();
 
         return reviewRepository.save(review);
     }
+
 
     public void deleteReview(Long idReview) throws ReviewNotFoundByIdException {
         Review review = reviewRepository.findById(idReview)

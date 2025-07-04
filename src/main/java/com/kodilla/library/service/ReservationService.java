@@ -12,12 +12,14 @@ import com.kodilla.library.model.BookStatus;
 import com.kodilla.library.model.Reservation;
 import com.kodilla.library.model.User;
 import com.kodilla.library.repository.BookRepository;
+import com.kodilla.library.repository.LoanRepository;
 import com.kodilla.library.repository.ReservationRepository;
 import com.kodilla.library.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final BookRepository bookRepository;
+    private final LoanRepository loanRepository;
     private final UserRepository userRepository;
 
     public Reservation reserveBook(Long idUser, Long idBook)
@@ -137,6 +140,7 @@ public class ReservationService {
         }
         return reservationRepository.findAllByBook_IdBook(idBook);
     }
+
     public void deleteReservation(Long idReservation) {
         Reservation reservation = reservationRepository.findById(idReservation)
                 .orElseThrow(() -> new ReservationNotFoundException(idReservation));
@@ -162,57 +166,54 @@ public class ReservationService {
         reservationRepository.delete(reservation);
     }
 
-    @Scheduled(fixedRate = 5 * 60 * 1000)
-    public void checkUnavailableBooksAndNotify() {
+
+    @Transactional
+    @Scheduled(fixedRate = 60 * 1000)
+    public void manageReservationsAndAvailability() {
         LocalDateTime now = LocalDateTime.now();
 
-        List<Book> notAvailableBooks = bookRepository.findAll().stream()
-                .filter(book -> book.getStatuses().contains(BookStatus.NOT_RETURNED))
+        reservationRepository.findAllByActiveTrue().stream()
+                .filter(res -> res.getEndDate() != null && res.getEndDate().isBefore(now))
+                .forEach(res -> {
+                    res.setActive(false);
+                    reservationRepository.save(res);
+                });
+
+        List<Book> notReturnedBooks = bookRepository.findAll().stream()
+                .filter(book -> book.getStatuses() != null && book.getStatuses().contains(BookStatus.NOT_RETURNED))
                 .toList();
 
-        for (Book book : notAvailableBooks) {
-            List<Reservation> futureReservations = reservationRepository
-                    .findAllByBook_IdBook(book.getIdBook())
-                    .stream()
-                    .filter(res -> res.getStartDate().isAfter(now))
-                    .filter(res -> !res.getUnavailableNotificationSent())
-                    .toList();
+        for (Book book : notReturnedBooks) {
+            reservationRepository.findAllByBook_IdBook(book.getIdBook()).stream()
+                    .filter(res -> res.getStartDate() != null && res.getStartDate().isAfter(now))
+                    .filter(res -> !Boolean.TRUE.equals(res.getUnavailableNotificationSent()))
+                    .forEach(res -> {
+                        System.out.println("[NOTIFICATION] Reservation for book '" + book.getTitle()
+                                + "' was canceled for user: " + res.getUser().getEmail());
 
-            for (Reservation reservation : futureReservations) {
-                System.out.println("[NOTIFICATION] Reservation for book '" + book.getTitle()
-                        + "' was canceled for user: " + reservation.getUser().getEmail()
-                        + " because another user didn't return the book on time.");
-
-                reservation.setActive(false);
-                reservation.setUnavailableNotificationSent(true);
-                reservationRepository.save(reservation);
-            }
+                        res.setActive(false);
+                        res.setUnavailableNotificationSent(true);
+                        reservationRepository.save(res);
+                    });
         }
-    }
 
-    @Scheduled(fixedRate = 5 * 60 * 1000)
-    public void expireOldReservations() {
-        List<Reservation> activeReservations = reservationRepository.findAllByActiveTrue();
-        LocalDateTime now = LocalDateTime.now();
+        List<Book> allBooks = bookRepository.findAll();
 
-        for (Reservation reservation : activeReservations) {
-            if (reservation.getEndDate().isBefore(now)) {
-                reservation.setActive(false);
-                reservationRepository.save(reservation);
+        for (Book book : allBooks) {
+            boolean hasActiveReservation = reservationRepository
+                    .findAllByBook_IdBook(book.getIdBook()).stream()
+                    .anyMatch(res -> Boolean.TRUE.equals(res.getActive()));
 
-                Book book = reservation.getBook();
-                boolean anyStillActive = reservationRepository
-                        .findAllByBook_IdBook(book.getIdBook())
-                        .stream()
-                        .anyMatch(Reservation::getActive);
+            boolean hasActiveLoan = loanRepository
+                    .existsByBook_IdBookAndReturnedFalse(book.getIdBook());
 
-                if (!anyStillActive) {
-                    book.setAvailable(true);
-                    book.getStatuses().clear();
-                    book.getStatuses().add(BookStatus.AVAILABLE);
-                    bookRepository.save(book);
-                }
+            if (!hasActiveReservation && !hasActiveLoan) {
+                book.setAvailable(true);
+                book.getStatuses().clear();
+                book.getStatuses().add(BookStatus.AVAILABLE);
+                bookRepository.save(book);
             }
         }
     }
 }
+

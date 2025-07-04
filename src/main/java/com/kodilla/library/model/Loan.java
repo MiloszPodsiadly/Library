@@ -2,15 +2,7 @@ package com.kodilla.library.model;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +37,11 @@ public class Loan {
     @Builder.Default
     @Setter
     private Boolean returned = false;
+
+    @Builder.Default
+    @Setter
+    @Column(name = "fine_issued")
+    private Boolean fineIssued = false;
 
     @Builder.Default
     @Setter

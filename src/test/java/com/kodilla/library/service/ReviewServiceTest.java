@@ -18,7 +18,6 @@ class ReviewServiceTest {
     @Mock private ReviewRepository reviewRepository;
     @Mock private BookRepository bookRepository;
     @Mock private UserRepository userRepository;
-
     @InjectMocks private ReviewService reviewService;
 
     private User user;
@@ -65,8 +64,8 @@ class ReviewServiceTest {
     @Test
     @DisplayName("❌ Should throw when book not found during review add")
     void shouldThrowWhenBookNotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
         when(bookRepository.findById(2L)).thenReturn(Optional.empty());
-
         assertThatThrownBy(() -> reviewService.addReview(1L, 2L, "Cool", 3))
                 .isInstanceOf(BookNotFoundByIdException.class);
         System.out.println("❌ Book not found for review.");

@@ -1,3 +1,6 @@
+jwt:
+  secret: superTajnyKluczJWT12345678901234567890
+
 spring:
   profiles:
     active: dev
@@ -14,8 +17,34 @@ spring:
     username: kodilla_user
     password: kodilla_password
 
-jwt:
-  secret: superTajnyKluczJWT12345678901234567890
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev2
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+    show-sql: false
 
 ---
 
@@ -30,14 +59,13 @@ spring:
     password: kodilla_password
 
   jpa:
-    database: mysql
     hibernate:
       ddl-auto: update
     show-sql: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
         format_sql: false
-    database-platform: org.hibernate.dialect.MySQL8Dialect
 
 logging:
   level:
@@ -48,9 +76,6 @@ logging:
     org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration: ERROR
 
 debug: false
-
-jwt:
-  secret: superTajnyKluczJWT12345678901234567890
 
 ---
 
@@ -71,6 +96,3 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     generate-ddl: true
     show-sql: false
-
-jwt:
-  secret: test-secret-key

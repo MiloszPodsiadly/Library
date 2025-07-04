@@ -9,6 +9,7 @@ public record LoanDTO(
         LocalDateTime loanDate,
         LocalDateTime returnDate,
         Boolean returned,
+        Boolean fineIssued,
         Integer extensionCount
 ) {}
 

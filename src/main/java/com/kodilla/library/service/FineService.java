@@ -78,7 +78,7 @@
         }
 
         private BigDecimal calculateAmountUntilNow(Fine fine) {
-            long days = ChronoUnit.DAYS.between(fine.getIssuedDate().toLocalDate(), LocalDate.now());
+            long days = ChronoUnit.DAYS.between(fine.getIssuedDate().toLocalDate(), LocalDateTime.now());
             if (days < 0) days = 0;
             return DAILY_RATE.multiply(BigDecimal.valueOf(days));
         }
@@ -118,7 +118,7 @@
                     .stream(fineRepository.findAll().spliterator(), false)
                     .filter(fine -> !fine.getPaid())
                     .filter(fine -> fine.getLoan() != null && !fine.getLoan().getReturned())
-                    .collect(Collectors.toList());
+                    .toList();
 
             for (Fine fine : finesToUpdate) {
                 long daysOverdue = ChronoUnit.DAYS.between(fine.getIssuedDate().toLocalDate(), today);

@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 class FineServiceTest {
 
     @Mock private FineRepository fineRepository;
-    @Mock private LoanRepository loanRepository;
+
     @Mock private UserRepository userRepository;
 
     @InjectMocks private FineService fineService;

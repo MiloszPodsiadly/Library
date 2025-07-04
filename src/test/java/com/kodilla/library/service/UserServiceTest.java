@@ -159,7 +159,7 @@ class UserServiceTest {
         when(accessGuard.checkOwner(1L)).thenReturn(true);
         when(userRepository.existsById(1L)).thenReturn(true);
 
-        userService.deleteUser(1L, user);
+        userService.deleteUser(1L);
 
         verify(userRepository).deleteById(1L);
         System.out.println("🗑️ User deleted.");
@@ -170,7 +170,7 @@ class UserServiceTest {
     void shouldBlockUnauthorizedDelete() {
         when(accessGuard.checkOwner(1L)).thenReturn(false);
 
-        assertThatThrownBy(() -> userService.deleteUser(1L, user))
+        assertThatThrownBy(() -> userService.deleteUser(1L))
                 .isInstanceOf(SecurityException.class);
 
         System.out.println("⛔ Unauthorized delete attempt blocked.");

@@ -62,12 +62,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{idUser}")
-    public ResponseEntity<Void> deleteUser(
-            @PathVariable Long idUser,
-            @RequestBody UserDTO authUserDto
-    ) throws UserNotFoundByIdException {
-        User authUser = userMapper.toEntity(authUserDto);
-        userService.deleteUser(idUser, authUser);
+    public ResponseEntity<Void> deleteUser(@PathVariable Long idUser) throws UserNotFoundByIdException {
+        userService.deleteUser(idUser);
         return ResponseEntity.noContent().build();
     }
 

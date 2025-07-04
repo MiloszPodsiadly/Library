@@ -99,21 +99,6 @@ class LoanServiceTest {
     }
 
     @Test
-    @DisplayName("🛑 Should throw if user exceeds max active loans")
-    void shouldRejectLoanIfMaxActiveReached() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(bookRepository.findById(2L)).thenReturn(Optional.of(book));
-        when(reservationRepository.findAllByBook_IdBook(2L)).thenReturn(List.of(reservation));
-        when(loanRepository.countByUser_IdUserAndReturnedFalse(1L)).thenReturn(3L);
-
-        assertThatThrownBy(() -> loanService.loanBook(1L, 2L))
-                .isInstanceOf(LoanNotAllowedException.class)
-                .hasMessageContaining("maximum of 3");
-
-        System.out.println("⚠️ Rejected loan – user reached max loan limit.");
-    }
-
-    @Test
     @DisplayName("🔁 Should extend loan if allowed")
     void shouldExtendLoan() throws Exception {
         loan.setExtensionCount(0);

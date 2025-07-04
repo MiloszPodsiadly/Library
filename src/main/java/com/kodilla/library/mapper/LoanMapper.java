@@ -22,6 +22,7 @@ public class LoanMapper {
                 loan.getLoanDate(),
                 loan.getReturnDate(),
                 loan.getReturned(),
+                loan.getFineIssued(),
                 loan.getExtensionCount()
         );
     }

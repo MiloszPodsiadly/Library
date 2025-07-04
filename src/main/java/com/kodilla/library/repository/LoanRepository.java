@@ -16,5 +16,7 @@ public interface LoanRepository extends CrudRepository<Loan, Long> {
     long countByUser_IdUserAndReturnedFalse(Long idUser);
 
     long countByBook_IdBook(Long idBook);
+
+    boolean existsByBook_IdBookAndReturnedFalse(Long idBook);
 }
 

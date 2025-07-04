@@ -90,7 +90,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long idUser, User authenticatedUser) throws UserNotFoundByIdException {
+    public void deleteUser(Long idUser) throws UserNotFoundByIdException {
         if (!accessGuard.checkOwner(idUser)) {
             throw new SecurityException("Unauthorized access.");
         }
