@@ -24,10 +24,10 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 
 ## 📊 Tech Stack
 
-- **Java 17**
-- **Spring Boot 3.x**
+- **Java 21**
+- **Spring Boot 3.4.4**
 - **Hibernate** / JPA
-- **MySQL 8+** (or H2 for testing)
+- **MySQL 8.0 || H2 for testing**
 - **MapStruct**
 - **Lombok**
 - **JUnit 5 & Mockito**
@@ -37,8 +37,8 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 
 ## 🚪 Prerequisites
 
-- JDK 17+
-- Maven 3.8+
+- JDK 21+
+- Gradle 8.12.1
 - MySQL 8+
 - Docker & Docker Compose (optional)
 
@@ -48,7 +48,6 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 
 ```bash
 git clone https://github.com/MiloszPodsiadly/Library.git
-cd Library
 ```
 
 Configure database connection in `src/main/resources/application.yml`.
@@ -182,7 +181,50 @@ networks:
 volumes:
   mysql-data:
 ```
+Sample `build.gradle` for local development:
+```bash
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
 
+group = 'com.kodilla'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'org.projectlombok:lombok:1.18.30'
+
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+```
 ---
 
 ## 🚀 Running the Application
@@ -191,11 +233,12 @@ volumes:
 docker-compose up --build
 ```
 ```bash
-gradle bootRun
-```
-```bash
 LibraryApplication <-- with method main class
 ```
+```bash
+gradle bootRun
+```
+
 API will be available at: `http://localhost:8080/api/v1`
 
 ---

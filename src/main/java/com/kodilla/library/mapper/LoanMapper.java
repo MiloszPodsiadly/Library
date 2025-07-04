@@ -6,9 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.kodilla.library.dto.LoanDTO;
-import com.kodilla.library.model.Book;
 import com.kodilla.library.model.Loan;
-import com.kodilla.library.model.User;
 
 @Component
 public class LoanMapper {
@@ -26,21 +24,6 @@ public class LoanMapper {
                 loan.getReturned(),
                 loan.getExtensionCount()
         );
-    }
-
-    public Loan toEntity(LoanDTO dto, User user, Book book) {
-        if (dto == null) {
-            return null;
-        }
-        return Loan.builder()
-                .idLoan(dto.idLoan())
-                .user(user)
-                .book(book)
-                .loanDate(dto.loanDate())
-                .returnDate(dto.returnDate())
-                .returned(dto.returned())
-                .extensionCount(dto.extensionCount())
-                .build();
     }
 
     public List<LoanDTO> toDtoList(List<Loan> loans) {

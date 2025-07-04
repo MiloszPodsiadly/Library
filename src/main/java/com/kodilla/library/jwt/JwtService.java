@@ -20,15 +20,13 @@ import com.kodilla.library.model.User;
 public class JwtService {
 
     @Value("${jwt.secret}")
+
     private String secretKey;
 
     private static final long EXPIRATION_MILLIS = 1000 * 60 * 60; // 1h
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
-    }
-    public String extractEmail(String token) {
-        return getAllClaims(token).get("email", String.class);
     }
 
     public String generateToken(User user) {

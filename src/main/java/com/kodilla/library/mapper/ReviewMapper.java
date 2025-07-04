@@ -6,9 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.kodilla.library.dto.ReviewDTO;
-import com.kodilla.library.model.Book;
 import com.kodilla.library.model.Review;
-import com.kodilla.library.model.User;
 
 @Component
 public class ReviewMapper {
@@ -25,20 +23,6 @@ public class ReviewMapper {
                 review.getComment(),
                 review.getCreatedAt()
         );
-    }
-
-    public Review toEntity(ReviewDTO dto, User user, Book book) {
-        if (dto == null) {
-            return null;
-        }
-        return Review.builder()
-                .idReview(dto.idReview())
-                .user(user)
-                .book(book)
-                .rating(dto.rating())
-                .comment(dto.comment())
-                .createdAt(dto.createdAt())
-                .build();
     }
 
     public List<ReviewDTO> toDtoList(List<Review> reviews) {

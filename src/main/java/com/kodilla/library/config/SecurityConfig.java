@@ -36,23 +36,19 @@ public class SecurityConfig {
                 .sessionManagement(sess ->
                         sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 🔓 Publiczne endpointy użytkowników
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/token").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").authenticated()
 
-                        // 🔓 Inne zasoby (dostosuj według potrzeb)
                         .requestMatchers("/api/v1/books/**").permitAll()
                         .requestMatchers("/api/v1/reviews/**").permitAll()
                         .requestMatchers("/api/v1/favorites/**").permitAll()
 
-                        // wszystko inne dozwolone
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
 }

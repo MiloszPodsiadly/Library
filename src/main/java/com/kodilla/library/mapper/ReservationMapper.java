@@ -6,9 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.kodilla.library.dto.ReservationDTO;
-import com.kodilla.library.model.Book;
 import com.kodilla.library.model.Reservation;
-import com.kodilla.library.model.User;
 
 @Component
 public class ReservationMapper {
@@ -26,20 +24,6 @@ public class ReservationMapper {
                 reservation.getReservationOrder(),
                 reservation.getUnavailableNotificationSent()
         );
-    }
-
-    public Reservation toEntity(ReservationDTO dto, User user, Book book) {
-        if (dto == null) {
-            return null;
-        }
-        return Reservation.builder()
-                .idReservation(dto.idReservation())
-                .user(user)
-                .book(book)
-                .reservationDate(dto.reservationDate())
-                .active(dto.active())
-                .reservationOrder(dto.reservationOrder())
-                .build();
     }
 
     public List<ReservationDTO> toDtoList(List<Reservation> reservations) {

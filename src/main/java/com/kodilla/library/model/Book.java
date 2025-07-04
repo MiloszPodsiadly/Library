@@ -63,6 +63,7 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private List<Review> reviews;
 
+    @Builder.Default
     @ElementCollection(targetClass = BookStatus.class, fetch = FetchType.EAGER)
     @CollectionTable(
             name = "book_statuses",

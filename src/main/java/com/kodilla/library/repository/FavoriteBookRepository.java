@@ -12,14 +12,10 @@ public interface FavoriteBookRepository extends CrudRepository<FavoriteBook, Lon
 
     boolean existsByUser_IdUserAndBook_IdBook(Long idUser, Long idBook);
 
-    List<FavoriteBook> findAllByBook_IdBook(Long idBook);
-
     List<FavoriteBook> findAllByUser_IdUser(Long idUser);
 
     Optional<FavoriteBook> findByUser_IdUserAndBook_IdBook(Long idUser, Long idBook);
 
     Long countByBook_IdBook(Long idBook);
-
-    void deleteByUser_IdUserAndBook_IdBook(Long idUser, Long idBook);
 }
 

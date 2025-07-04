@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import com.kodilla.library.dto.FineDTO;
 import com.kodilla.library.model.Fine;
-import com.kodilla.library.model.Loan;
 
 @Component
 public class FineMapper {
@@ -23,19 +22,6 @@ public class FineMapper {
                 fine.getIssuedDate(),
                 fine.getPaid()
         );
-    }
-
-    public Fine toEntity(FineDTO dto, Loan loan) {
-        if (dto == null) {
-            return null;
-        }
-        return Fine.builder()
-                .idFine(dto.idFine())
-                .loan(loan)
-                .amount(dto.amount())
-                .issuedDate(dto.issuedDate())
-                .paid(dto.paid())
-                .build();
     }
 
     public List<FineDTO> toDtoList(List<Fine> fines) {
