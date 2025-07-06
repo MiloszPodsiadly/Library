@@ -81,60 +81,44 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("❌ Should throw if reservation is too old to cancel")
-    void shouldThrowWhenCancelingOldReservation() {
-        reservation = Reservation.builder()
-                .idReservation(3L)
-                .user(user)
-                .book(book)
-                .active(true)
-                .createdAt(LocalDateTime.now().minusHours(2))
-                .startDate(LocalDateTime.now().plusHours(1))
-                .endDate(LocalDateTime.now().plusHours(7))
-                .build();
-
-        when(reservationRepository.findById(3L)).thenReturn(Optional.of(reservation));
-
-        assertThatThrownBy(() -> reservationService.cancelReservation(3L))
-                .isInstanceOf(ReservationNotAllowedException.class)
-                .hasMessageContaining("cannot be canceled");
-
-        System.out.println("❌ Cancel rejected: reservation too old.");
-    }
-
-    @Test
-    @DisplayName("🗑️ Should delete reservation created less than 1 hour ago")
-    void shouldDeleteRecentActiveReservation() {
+    @DisplayName("⛔ Should not allow deleting active reservation")
+    void shouldNotDeleteActiveReservation() {
         reservation.setActive(true);
-        when(reservationRepository.findById(3L)).thenReturn(Optional.of(reservation));
-
-        reservationService.deleteReservation(3L);
-
-        verify(reservationRepository).delete(reservation);
-        System.out.println("🗑️ Active reservation deleted successfully.");
-    }
-
-    @Test
-    @DisplayName("⛔ Should block deletion of active reservation older than 1 hour")
-    void shouldNotDeleteOldActiveReservation() {
-        reservation = Reservation.builder()
-                .idReservation(3L)
-                .user(user)
-                .book(book)
-                .active(true)
-                .createdAt(LocalDateTime.now().minusHours(2))
-                .startDate(LocalDateTime.now().plusHours(1))
-                .endDate(LocalDateTime.now().plusHours(7))
-                .build();
+        reservation.setEndDate(LocalDateTime.now().minusHours(2)); // już po zakończeniu, ale nadal aktywna
 
         when(reservationRepository.findById(3L)).thenReturn(Optional.of(reservation));
 
         assertThatThrownBy(() -> reservationService.deleteReservation(3L))
-                .isInstanceOf(ReservationNotAllowedException.class);
-
-        System.out.println("⛔ Deletion blocked: active reservation too old.");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Cannot delete an active reservation");
     }
 
+    @Test
+    @DisplayName("🗑️ Should delete reservation if not active and ended")
+    void shouldDeleteEndedInactiveReservation() {
+        reservation.setActive(false);
+        reservation.setEndDate(LocalDateTime.now().minusHours(1)); // już się skończyła
+
+        when(reservationRepository.findById(3L)).thenReturn(Optional.of(reservation));
+
+        reservationService.deleteReservation(3L);
+
+        verify(reservationRepository).deleteById(3L);
+        System.out.println("🗑️ Ended inactive reservation deleted successfully.");
+    }
+
+    @Test
+    @DisplayName("⛔ Should not allow deleting reservation that hasn't ended")
+    void shouldNotDeleteReservationThatHasNotEnded() {
+        reservation.setActive(false);
+        reservation.setEndDate(LocalDateTime.now().plusHours(1)); // koniec dopiero za godzinę
+
+        when(reservationRepository.findById(3L)).thenReturn(Optional.of(reservation));
+
+        assertThatThrownBy(() -> reservationService.deleteReservation(3L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Cannot delete reservation that has not ended yet");
+    }
 
     @Test
     @DisplayName("🔍 Should return all reservations for user")

@@ -14,11 +14,11 @@ public class AccessGuard {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !(auth.getPrincipal() instanceof User user)) {
-            throw new SecurityException("Brak uwierzytelnienia.");
+            throw new SecurityException("No authentication");
         }
 
         if (user.getTokenExpiresAt() == null || user.getTokenExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new SecurityException("Token wygasł – zaloguj się ponownie.");
+            throw new SecurityException("Token has expired please generate token again");
         }
 
         return user.getIdUser().equals(idUser);

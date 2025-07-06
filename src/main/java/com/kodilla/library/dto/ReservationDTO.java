@@ -7,6 +7,7 @@ public record ReservationDTO(
         Long idUser,
         Long idBook,
         LocalDateTime reservationDate,
+        LocalDateTime endDate,
         Boolean active,
         Integer reservationOrder,
         Boolean unavailableNotificationSent

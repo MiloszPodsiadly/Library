@@ -43,7 +43,7 @@ public class JwtService {
 
     public boolean isTokenValid(String token) {
         try {
-            getAllClaims(token); // throws if invalid
+            getAllClaims(token);
             return true;
         } catch (JwtException e) {
             return false;

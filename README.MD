@@ -38,7 +38,7 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 ## 🚪 Prerequisites
 
 - JDK 21+
-- Gradle 8.12.1
+- Gradle 8.7.1+
 - MySQL 8+
 - Docker & Docker Compose (optional)
 
@@ -299,14 +299,19 @@ Authorization: Bearer <your_token_here>
   ```
 ### 🗓️ Reservations
 
-| Method | Endpoint                                  | Description               |
-| ------ | ----------------------------------------- | ------------------------- |
-| POST   | `/reservations?idUser={uid}&idBook={bid}` | Create a reservation      |
-| DELETE | `/reservations/{id}`                      | Cancel a reservation      |
-| DELETE | `/reservations/delete/{id}`               | Delete a reservation      |
-| GET    | `/reservations/user/{userId}`             | List reservations by user |
-| GET    | `/reservations/book/{bookId}`             | List reservations by book |
+| Method | Endpoint                                | Description               |
+|--------|-----------------------------------------|---------------------------|
+| POST   | `/reservations?idUser={id}&idBook={id}` | Create a reservation      |
+| DELETE | `/reservations/{id}`                    | Cancel a reservation      |
+| DELETE | `/reservations/delete/{id}`             | Delete a reservation      |
+| GET    | `/reservations/user/{userId}`           | List reservations by user |
+| GET    | `/reservations/book/{bookId}`           | List reservations by book |
 
+- Make a new reservation
+- Example request:
+  ```bash
+  POST http://localhost:8080/api/v1/reservations?idUser={id}&idBook={id}
+  ```
 ### 📦 Loans
 
 | Method | Endpoint                           | Description          |

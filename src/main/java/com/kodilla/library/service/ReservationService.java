@@ -2,6 +2,7 @@ package com.kodilla.library.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import com.kodilla.library.exception.BookNotFoundByIdException;
 import com.kodilla.library.exception.ReservationNotAllowedException;
@@ -115,17 +116,26 @@ public class ReservationService {
         }
     }
 
+    @Transactional
     public void cancelReservation(Long idReservation) {
         Reservation reservation = reservationRepository.findById(idReservation)
-                .orElseThrow(() -> new ReservationNotFoundException(idReservation));
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found with ID: " + idReservation));
 
-        if (!isCancelable(reservation)) {
-            throw new ReservationNotAllowedException("Booking cannot be canceled for more than 1 hour.");
+        LocalDateTime now = LocalDateTime.now();
+
+        if (reservation.getStartDate() == null) {
+            throw new IllegalStateException("Reservation start date is not set.");
         }
 
-        deactivateReservation(reservation);
-        updateBookStatusIfNoActiveReservations(reservation.getBook());
+        if (now.isAfter(reservation.getStartDate().minusHours(1))) {
+            throw new IllegalStateException("You can only cancel the reservation up to 1 hour before it starts.");
+        }
+
+        reservation.setActive(false);
+        reservation.setEndDate(now);
+        reservationRepository.save(reservation);
     }
+
 
     public List<Reservation> getReservationsByUser(Long userId) throws UserNotFoundByIdException {
         if (!userRepository.existsById(userId)) {
@@ -141,36 +151,36 @@ public class ReservationService {
         return reservationRepository.findAllByBook_IdBook(idBook);
     }
 
+    @Transactional
     public void deleteReservation(Long idReservation) {
         Reservation reservation = reservationRepository.findById(idReservation)
-                .orElseThrow(() -> new ReservationNotFoundException(idReservation));
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found with ID: " + idReservation));
 
         LocalDateTime now = LocalDateTime.now();
 
-        boolean isCreatedLessThanHourAgo = reservation.getCreatedAt()
-                .plusHours(1)
-                .isAfter(now);
-
-        boolean isPastEndDate = reservation.getEndDate().isBefore(now);
-
-        if (reservation.getActive()) {
-            if (!isCreatedLessThanHourAgo) {
-                throw new ReservationNotAllowedException("Cannot delete active reservation older than 1 hour");
-            }
-        } else {
-            if (!isPastEndDate) {
-                throw new ReservationNotAllowedException("Cannot delete inactive reservation before its end date");
-            }
+        if (Boolean.TRUE.equals(reservation.getActive())) {
+            throw new IllegalStateException("Cannot delete an active reservation.");
         }
 
-        reservationRepository.delete(reservation);
-    }
+        if (reservation.getEndDate() == null || reservation.getEndDate().isAfter(now)) {
+            throw new IllegalStateException("Cannot delete reservation that has not ended yet.");
+        }
 
+        reservationRepository.deleteById(idReservation);
+    }
 
     @Transactional
     @Scheduled(fixedRate = 60 * 1000)
     public void manageReservationsAndAvailability() {
         LocalDateTime now = LocalDateTime.now();
+
+        StreamSupport.stream(reservationRepository.findAll().spliterator(), false)
+                .filter(res -> !Boolean.TRUE.equals(res.getActive()))
+                .filter(res -> res.getStartDate() != null && !res.getStartDate().isAfter(now))
+                .forEach(res -> {
+                    res.setActive(true);
+                    reservationRepository.save(res);
+                });
 
         reservationRepository.findAllByActiveTrue().stream()
                 .filter(res -> res.getEndDate() != null && res.getEndDate().isBefore(now))
@@ -185,7 +195,7 @@ public class ReservationService {
 
         for (Book book : notReturnedBooks) {
             reservationRepository.findAllByBook_IdBook(book.getIdBook()).stream()
-                    .filter(res -> res.getStartDate() != null && res.getStartDate().isAfter(now))
+                    .filter(res -> res.getStartDate() != null && res.getStartDate().isBefore(now.plusDays(1)))
                     .filter(res -> !Boolean.TRUE.equals(res.getUnavailableNotificationSent()))
                     .forEach(res -> {
                         System.out.println("[NOTIFICATION] Reservation for book '" + book.getTitle()

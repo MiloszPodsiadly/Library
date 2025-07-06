@@ -20,6 +20,7 @@ public class ReservationMapper {
                 reservation.getUser().getIdUser(),
                 reservation.getBook().getIdBook(),
                 reservation.getReservationDate(),
+                reservation.getEndDate(),
                 reservation.getActive(),
                 reservation.getReservationOrder(),
                 reservation.getUnavailableNotificationSent()

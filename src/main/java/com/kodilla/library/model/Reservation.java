@@ -57,6 +57,7 @@ public class Reservation {
     private LocalDateTime startDate;
 
     @Column(name = "end_date")
+    @Setter
     private LocalDateTime endDate;
 
     @Builder.Default
