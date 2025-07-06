@@ -45,24 +45,43 @@
                     .collect(Collectors.toList());
         }
 
-        public Fine addFine(Long idUser, String reason) throws UserNotFoundByIdException {
-            User user = userRepository.findById(idUser)
-                    .orElseThrow(() -> new UserNotFoundByIdException(idUser));
+        public Fine addFineForLoan(Long idLoan, String reason) {
+            if (reason == null || reason.trim().isEmpty()) {
+                throw new IllegalArgumentException("Reason cannot be null or empty.");
+            }
+
+            Loan loan = loanRepository.findById(idLoan)
+                    .orElseThrow(() -> new IllegalArgumentException("Loan with ID " + idLoan + " not found"));
+
+            if (loan.getReturned() != null && loan.getReturned()) {
+                throw new IllegalStateException("Cannot issue fine for a returned loan.");
+            }
+
+            boolean fineExists = fineRepository.existsByLoan_IdLoan(idLoan);
+            if (fineExists) {
+                throw new IllegalStateException("A fine for this loan already exists.");
+            }
 
             Fine fine = Fine.builder()
-                    .user(user)
-                    .reason(reason)
+                    .loan(loan)
+                    .user(loan.getUser())
                     .issuedDate(LocalDateTime.now())
-                    .amount(BigDecimal.ZERO)
+                    .reason(reason.trim())
                     .paid(false)
+                    .amount(new BigDecimal("0.10"))
                     .build();
 
             return fineRepository.save(fine);
         }
 
+
         public Fine payFine(Long idFine) throws FineNotFoundException {
             Fine fine = fineRepository.findById(idFine)
                     .orElseThrow(() -> new FineNotFoundException(idFine));
+
+            if (Boolean.TRUE.equals(fine.getPaid())) {
+                throw new IllegalStateException("This fine has already been paid.");
+            }
 
             fine.setAmount(calculateAmountUntilNow(fine));
             fine.setPaid(true);

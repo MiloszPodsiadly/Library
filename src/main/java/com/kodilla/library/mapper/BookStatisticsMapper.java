@@ -19,7 +19,8 @@ public class BookStatisticsMapper {
                 stats.getBook().getIdBook(),
                 stats.getLoanCount(),
                 stats.getReservationCount(),
-                stats.getAverageRating()
+                stats.getAverageRating(),
+                stats.getFavoriteCount()
         );
     }
 

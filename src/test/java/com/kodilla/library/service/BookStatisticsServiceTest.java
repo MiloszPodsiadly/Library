@@ -108,46 +108,48 @@ class BookStatisticsServiceTest {
     }
 
     @Test
-    @DisplayName("📈 Should return loan count for specific book")
-    void shouldReturnLoanCountForBook() {
+    @DisplayName("📈 Should return loan count in formatted string")
+    void shouldReturnFormattedLoanCount() {
         // Given
         when(loanRepository.countByBook_IdBook(1L)).thenReturn(42L);
 
         // When
-        Long count = service.getLoanCountForBook(1L);
+        String result = service.getLoanCountForBook(1L);
 
         // Then
-        assertThat(count).isEqualTo(42L);
+        assertThat(result).isEqualTo("Loan count for book ID 1: 42");
     }
 
     @Test
-    @DisplayName("🔢 Should return reservation count for book")
+    @DisplayName("🔢 Should return reservation count for book (as text)")
     void shouldReturnReservationCountForBook() {
         // Given
         when(reservationRepository.countByBook_IdBook(1L)).thenReturn(7L);
 
         // When
-        Long count = service.getReservationCountForBook(1L);
+        String result = service.getReservationCountForBook(1L);
 
         // Then
-        assertThat(count).isEqualTo(7L);
+        assertThat(result).isEqualTo("Reservation count for book ID 1: 7");
     }
 
+
     @Test
-    @DisplayName("⭐ Should return average rating for a book")
-    void shouldReturnAverageRating() {
+    @DisplayName("⭐ Should return average rating for a book (as text)")
+    void shouldReturnAverageRatingAsText() {
         // Given
         when(reviewRepository.findAverageRatingByBookId(1L)).thenReturn(4.2);
 
         // When
-        Double avg = service.getAverageRatingForBook(1L);
+        String result = service.getAverageRatingForBook(1L);
 
         // Then
-        assertThat(avg).isEqualTo(4.2);
+        assertThat(result).isEqualTo("Average rating for book ID 1: 4.2");
     }
 
+
     @Test
-    @DisplayName("💗 Should return favorite count in formatted string")
+    @DisplayName("💗 Should return favorite count in formatted string with ID")
     void shouldReturnFormattedFavoriteCount() {
         // Given
         when(favoriteBookRepository.countByBook_IdBook(1L)).thenReturn(9L);
@@ -156,21 +158,24 @@ class BookStatisticsServiceTest {
         String result = service.getFavoriteCountForBook(1L);
 
         // Then
-        assertThat(result).isEqualTo("How many likes it has: 9");
+        assertThat(result).isEqualTo("Number of likes for book ID 1: 9");
     }
 
     @Test
-    @DisplayName("📘 Should return book by id or throw if not found")
-    void shouldReturnBookByIdOrThrow() throws BookNotFoundByIdException {
+    @DisplayName("📘 Should return book by ID when found")
+    void shouldReturnBookById() throws BookNotFoundByIdException {
         // Given
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book1));
 
         // When
-        Book found = service.getBookById(1L);
+        Book result = service.getBookById(1L);
 
         // Then
-        assertThat(found.getTitle()).isEqualTo("Book One");
+        assertThat(result).isNotNull();
+        assertThat(result.getIdBook()).isEqualTo(1L);
+        assertThat(result.getTitle()).isEqualTo("Book One");
     }
+
 
     @Test
     @DisplayName("❌ Should throw when book not found")
@@ -198,16 +203,4 @@ class BookStatisticsServiceTest {
         assertThat(result).isEqualTo(stats);
     }
 
-    @Test
-    @DisplayName("📄 Should return null if book statistics not found")
-    void shouldReturnNullWhenStatisticsNotFound() {
-        // Given
-        when(bookStatisticsRepository.findByBook_IdBook(1L)).thenReturn(Optional.empty());
-
-        // When
-        BookStatistics result = service.getStatisticsByBookId(1L);
-
-        // Then
-        assertThat(result).isNull();
-    }
 }

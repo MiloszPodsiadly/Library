@@ -63,27 +63,46 @@ public class BookStatisticsService {
                 .toList();
     }
 
-    public Long getLoanCountForBook(Long idBook) {
-        return loanRepository.countByBook_IdBook(idBook);
+    public String getLoanCountForBook(Long idBook) {
+        Long count = loanRepository.countByBook_IdBook(idBook);
+        return "Loan count for book ID " + idBook + ": " + count;
+    }
+
+    public String getReservationCountForBook(Long idBook) {
+        Long count = reservationRepository.countByBook_IdBook(idBook);
+        return "Reservation count for book ID " + idBook + ": " + count;
+    }
+
+    public String getAverageRatingForBook(Long idBook) {
+        Double avg = reviewRepository.findAverageRatingByBookId(idBook);
+        if (avg == null) {
+            return "Average rating for book ID " + idBook + ": No ratings yet";
+        }
+        return "Average rating for book ID " + idBook + ": " + avg;
+    }
+
+    public String getFavoriteCountForBook(Long idBook) {
+        Long count = favoriteBookRepository.countByBook_IdBook(idBook);
+        return "Number of likes for book ID " + idBook + ": " + count;
     }
 
     public BookStatistics getStatisticsByBookId(Long idBook) {
         return bookStatisticsRepository.findByBook_IdBook(idBook)
-                .orElse(null);
-    }
+                .orElseGet(() -> {
+                    Book book = bookRepository.findById(idBook)
+                            .orElseThrow(() -> new BookNotFoundByIdException(idBook));
 
-    public Long getReservationCountForBook(Long idBook) {
-        return reservationRepository.countByBook_IdBook(idBook);
-    }
+                    BookStatistics stats = BookStatistics.builder()
+                            .book(book)
+                            .loanCount(loanRepository.countByBook_IdBook(idBook))
+                            .reservationCount(reservationRepository.countByBook_IdBook(idBook))
+                            .averageRating(reviewRepository.findAverageRatingByBookId(idBook))
+                            .favoriteCount(favoriteBookRepository.countByBook_IdBook(idBook))
+                            .build();
 
-    public Double getAverageRatingForBook(Long idBook) {
-        return reviewRepository.findAverageRatingByBookId(idBook);
+                    return bookStatisticsRepository.save(stats);
+                });
     }
-
-    public String getFavoriteCountForBook(Long idBook) {
-        return "How many likes it has: " + favoriteBookRepository.countByBook_IdBook(idBook);
-    }
-
 
     public Book getBookById(Long idBook) throws BookNotFoundByIdException {
         return bookRepository.findById(idBook)

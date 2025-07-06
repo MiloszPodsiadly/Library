@@ -8,5 +8,6 @@ public record FineDTO(
         Long idLoan,
         BigDecimal amount,
         LocalDateTime issuedDate,
-        Boolean paid
+        Boolean paid,
+        String reason
 ) {}

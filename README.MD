@@ -38,7 +38,7 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 ## 🚪 Prerequisites
 
 - JDK 21+
-- Gradle 8.7.1+
+- Gradle 8.7.0+
 - MySQL 8+
 - Docker & Docker Compose (optional)
 
@@ -314,52 +314,84 @@ Authorization: Bearer <your_token_here>
   ```
 ### 📦 Loans
 
-| Method | Endpoint                           | Description          |
-| ------ | ---------------------------------- | -------------------- |
-| POST   | `/loans?idUser={uid}&idBook={bid}` | Create a new loan    |
-| PUT    | `/loans/{loanId}/return`           | Return borrowed book |
-| PUT    | `/loans/{loanId}/extend`           | Extend a loan        |
-| GET    | `/loans/user/{userId}`             | List loans by user   |
-| GET    | `/loans/active`                    | List active loans    |
+| Method | Endpoint                         | Description          |
+|--------|----------------------------------|----------------------|
+| POST   | `/loans?idUser={id}&idBook={id}` | Create a new loan    |
+| PUT    | `/loans/return{id}`              | Return borrowed book |
+| PUT    | `/loans/extend{id}`              | Extend a loan        |
+| GET    | `/loans/user/{id}`               | List loans by user   |
+| GET    | `/loans/active`                  | List active loans    |
 
-### 📊 Book Statistics
-
-| Method | Endpoint                              | Description                  |
-| ------ | ------------------------------------- | ---------------------------- |
-| GET    | `/books/statistics/{id}`              | Get stats for one book       |
-| GET    | `/books/statistics/top-loaned`        | Top 10 most loaned books     |
-| GET    | `/books/statistics/top-reserved`      | Top 3 most reserved books    |
-| GET    | `/books/statistics/top-favorite`      | Top 3 most favorited books   |
-| GET    | `/books/statistics/{id}/loans`        | Loan count for one book      |
-| GET    | `/books/statistics/{id}/reservations` | Reservation count for a book |
-| GET    | `/books/statistics/{id}/rating`       | Average rating of a book     |
-| GET    | `/books/statistics/{id}/favorites`    | Favorite count for a book    |
-
+- Make a loan (only during reservation)
+- Example request:
+ ```bash
+  POST http://localhost:8080/api/v1/loans?idUser={id}&idBook={id}
+  ```
 ### ⭐ Favorites
 
-| Method | Endpoint                               | Description           |
-| ------ | -------------------------------------- | --------------------- |
-| GET    | `/favorites/user/{userId}`             | List user's favorites |
-| POST   | `/favorites?idUser={uid}&idBook={bid}` | Add book to favorites |
-| DELETE | `/favorites?idUser={uid}&idBook={bid}` | Remove from favorites |
+| Method | Endpoint                             | Description           |
+| ------ |--------------------------------------| --------------------- |
+| GET    | `/favorites/user/{id}`               | List user's favorites |
+| POST   | `/favorites?idUser={id}&idBook={id}` | Add book to favorites |
+| DELETE | `/favorites?idUser={id}&idBook={id}` | Remove from favorites |
+
+- Add book to favorties
+- Example request:
+ ```bash
+  POST http://localhost:8080/api/v1/favorites?idUser={id}&idBook={id}
+  ```
 
 ### 📕 Reviews
 
-| Method | Endpoint                                                    | Description             |
-| ------ | ----------------------------------------------------------- | ----------------------- |
-| POST   | `/reviews?idUser={uid}&idBook={bid}&comment={c}&rating={r}` | Create a review         |
-| DELETE | `/reviews/{id}`                                             | Delete a review         |
-| GET    | `/reviews/book/{bookId}`                                    | List reviews for a book |
-| GET    | `/reviews/user/{userId}`                                    | List reviews by a user  |
+| Method | Endpoint             | Description             |
+| ------ |----------------------| ----------------------- |
+| POST   | `/reviews`           | Create a review         |
+| DELETE | `/reviews/{id}`      | Delete a review         |
+| GET    | `/reviews/book/{id}` | List reviews for a book |
+| GET    | `/reviews/user/{id}` | List reviews by a user  |
 
+- Leave a review
+- Example request:
+ ```json
+  {
+  "idUser": 1,
+  "idBook": 1,
+  "rating": 5,
+  "comment": "Great Book!"
+}
+  ```
+
+### 📊 Book Statistics
+
+| Method | Endpoint                               | Description                  |
+| ------ |----------------------------------------| ---------------------------- |
+| GET    | `/books/statistics/{id}`               | Get stats for one book       |
+| GET    | `/books/statistics/top-loaned`         | Top 10 most loaned books     |
+| GET    | `/books/statistics/top-reserved`       | Top 3 most reserved books    |
+| GET    | `/books/statistics/top-favorite`       | Top 3 most favorited books   |
+| GET    | `/books/statistics/loans/{id}`         | Loan count for one book      |
+| GET    | `/books/statistics/reservations/{id}`  | Reservation count for a book |
+| GET    | `/books/statistics/rating/{id}`        | Average rating of a book     |
+| GET    | `/books/statistics/favorites/{id}`     | Favorite count for a book    |
+
+- Check Statistic for the book 
+- Example request:
+ ```bash
+  GET http://localhost:8080/api/v1/books/statistics/{id}
+  ```
 ### 💳 Fines
 
-| Method | Endpoint                              | Description         |
-| ------ | ------------------------------------- | ------------------- |
-| GET    | `/fines/user/{userId}`                | List fines for user |
-| POST   | `/fines?idUser={uid}&reason={reason}` | Issue a new fine    |
-| PUT    | `/fines/{fineId}/pay`                 | Mark a fine as paid |
+| Method | Endpoint                 | Description         |
+|--------|--------------------------|---------------------|
+| GET    | `/fines/user/{userId}`   | List fines for user |
+| POST   | `/fines/loan/{id}`       | Create a new fine   |
+| PUT    | `/fines/pay/{id}`        | Mark a fine as paid |
 
+- Create fine
+- Example request:
+ ```bash
+"Too late return of the book"
+```
 ---
 
 ## 🙌 Contributing
@@ -376,7 +408,7 @@ Please follow the [Contributor Covenant](https://www.contributor-covenant.org/) 
 
 ## 📚 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ---
 

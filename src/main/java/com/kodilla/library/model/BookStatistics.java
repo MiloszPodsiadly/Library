@@ -27,7 +27,7 @@ public class BookStatistics {
     private Long idBookStatistics;
 
     @OneToOne
-    @JoinColumn(name = "idBook")
+    @JoinColumn(name = "id_book")
     private Book book;
 
     @Builder.Default
@@ -38,5 +38,8 @@ public class BookStatistics {
 
     @Builder.Default
     private Double averageRating = 0.0;
+
+    @Builder.Default
+    private Long favoriteCount = 0L;
 }
 

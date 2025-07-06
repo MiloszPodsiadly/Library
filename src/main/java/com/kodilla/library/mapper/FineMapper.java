@@ -20,7 +20,8 @@ public class FineMapper {
                 fine.getLoan().getIdLoan(),
                 fine.getAmount(),
                 fine.getIssuedDate(),
-                fine.getPaid()
+                fine.getPaid(),
+                fine.getReason()
         );
     }
 

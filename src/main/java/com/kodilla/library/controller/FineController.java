@@ -26,16 +26,17 @@ public class FineController {
         return ResponseEntity.ok(fineMapper.toDtoList(fines));
     }
 
-    @PostMapping
-    public ResponseEntity<FineDTO> addFine(
-            @RequestParam Long idUser,
-            @RequestParam String reason
-    ) throws UserNotFoundByIdException {
-        Fine fine = fineService.addFine(idUser, reason);
+    @PostMapping("/loan/{idLoan}")
+    public ResponseEntity<FineDTO> addFineByLoan(
+            @PathVariable Long idLoan,
+            @RequestBody String reason
+    ) {
+        Fine fine = fineService.addFineForLoan(idLoan, reason);
         return ResponseEntity.ok(fineMapper.toDto(fine));
     }
 
-    @PutMapping("/{idFine}/pay")
+
+    @PutMapping("/pay/{idFine}")
     public ResponseEntity<FineDTO> payFine(@PathVariable Long idFine)
             throws FineNotFoundException {
         Fine fine = fineService.payFine(idFine);

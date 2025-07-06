@@ -42,7 +42,7 @@ class AccessGuardTest {
 
         assertThatThrownBy(() -> accessGuard.checkOwner(1L))
                 .isInstanceOf(SecurityException.class)
-                .hasMessageContaining("Brak uwierzytelnienia");
+                .hasMessageContaining("No authentication");
 
         System.out.println("❗ Blocked: no authentication.");
     }
@@ -55,7 +55,7 @@ class AccessGuardTest {
 
         assertThatThrownBy(() -> accessGuard.checkOwner(1L))
                 .isInstanceOf(SecurityException.class)
-                .hasMessageContaining("Brak uwierzytelnienia");
+                .hasMessageContaining("No authentication");
 
         System.out.println("❗ Blocked: invalid principal.");
     }
@@ -73,7 +73,7 @@ class AccessGuardTest {
 
         assertThatThrownBy(() -> accessGuard.checkOwner(1L))
                 .isInstanceOf(SecurityException.class)
-                .hasMessageContaining("Token wygasł");
+                .hasMessageContaining("Token has expired please generate token again");
 
         System.out.println("⏳ Blocked: token expired.");
     }

@@ -11,5 +11,6 @@ public record LoanDTO(
         Boolean returned,
         Boolean fineIssued,
         Integer extensionCount
+
 ) {}
 

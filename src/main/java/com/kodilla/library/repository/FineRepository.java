@@ -9,4 +9,5 @@ import com.kodilla.library.model.Fine;
 @Repository
 public interface FineRepository extends CrudRepository<Fine, Long> {
     List<Fine> findAllByUser_IdUser(Long idUser);
+    boolean existsByLoan_IdLoan(Long idLoan);
 }

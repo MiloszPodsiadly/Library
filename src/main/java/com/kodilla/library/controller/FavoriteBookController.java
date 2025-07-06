@@ -48,12 +48,12 @@ public class FavoriteBookController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> removeFavoriteBook(
+    public ResponseEntity<String> removeFavoriteBook(
             @RequestParam Long idUser,
             @RequestParam Long idBook)
             throws FavoriteNotFoundException {
 
         favoriteBookService.removeFavoriteBook(idUser, idBook);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Favorite has been removed");
     }
 }

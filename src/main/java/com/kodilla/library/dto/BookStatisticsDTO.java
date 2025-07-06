@@ -4,6 +4,7 @@ public record BookStatisticsDTO(
         Long idBookStatistics,
         Long loanCount,
         Long reservationCount,
-        Double averageRating
+        Double averageRating,
+        Long favoriteCount
 ) {}
 

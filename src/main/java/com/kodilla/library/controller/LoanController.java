@@ -28,14 +28,14 @@ public class LoanController {
         return ResponseEntity.ok(loanMapper.toDto(loan));
     }
 
-    @PutMapping("/{idLoan}/return")
+    @PutMapping("/return/{idLoan}")
     public ResponseEntity<LoanDTO> returnBook(@PathVariable Long idLoan)
             throws LoanNotFoundByIdException {
         Loan loan = loanService.returnBook(idLoan);
         return ResponseEntity.ok(loanMapper.toDto(loan));
     }
 
-    @PutMapping("/{idLoan}/extend")
+    @PutMapping("/extend/{idLoan}")
     public ResponseEntity<LoanDTO> extendLoan(@PathVariable Long idLoan)
             throws LoanNotFoundByIdException, LoanNotAllowedException {
         Loan loan = loanService.extendLoan(idLoan);

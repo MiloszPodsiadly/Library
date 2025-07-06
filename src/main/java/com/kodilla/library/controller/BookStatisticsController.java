@@ -55,22 +55,23 @@ public class BookStatisticsController {
         return ResponseEntity.ok(bookMapper.toDtoList(topBooks));
     }
 
-    @GetMapping("/{idBook}/loans")
-    public ResponseEntity<Long> getLoanCountForBook(@PathVariable Long idBook) {
+    @GetMapping("/loans/{idBook}")
+    public ResponseEntity<String> getLoanCount(@PathVariable Long idBook) {
         return ResponseEntity.ok(bookStatisticsService.getLoanCountForBook(idBook));
     }
 
-    @GetMapping("/{idBook}/reservations")
-    public ResponseEntity<Long> getReservationCountForBook(@PathVariable Long idBook) {
+
+    @GetMapping("/reservations/{idBook}")
+    public ResponseEntity<String> getReservationCountForBook(@PathVariable Long idBook) {
         return ResponseEntity.ok(bookStatisticsService.getReservationCountForBook(idBook));
     }
 
-    @GetMapping("/{idBook}/rating")
-    public ResponseEntity<Double> getAverageRatingForBook(@PathVariable Long idBook) {
+    @GetMapping("/rating/{idBook}")
+    public ResponseEntity<String> getAverageRatingForBook(@PathVariable Long idBook) {
         return ResponseEntity.ok(bookStatisticsService.getAverageRatingForBook(idBook));
     }
 
-    @GetMapping("/{idBook}/favorites")
+    @GetMapping("/favorites/{idBook}")
     public ResponseEntity<String> getFavoriteCountForBook(@PathVariable Long idBook) {
         return ResponseEntity.ok(bookStatisticsService.getFavoriteCountForBook(idBook));
     }

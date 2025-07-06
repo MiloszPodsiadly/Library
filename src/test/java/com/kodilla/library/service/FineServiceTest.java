@@ -3,6 +3,7 @@ package com.kodilla.library.service;
 import com.kodilla.library.exception.FineNotFoundException;
 import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.model.Fine;
+import com.kodilla.library.model.Loan;
 import com.kodilla.library.model.User;
 import com.kodilla.library.repository.FineRepository;
 import com.kodilla.library.repository.LoanRepository;
@@ -23,6 +24,8 @@ class FineServiceTest {
     @Mock private FineRepository fineRepository;
 
     @Mock private UserRepository userRepository;
+
+    @Mock private LoanRepository loanRepository;
 
     @InjectMocks private FineService fineService;
 
@@ -89,46 +92,59 @@ class FineServiceTest {
 
         System.out.println("❗ Expected exception for unknown user.");
     }
-
     @Test
     @DisplayName("➕ Should add fine for existing user")
-    void shouldAddFine() throws UserNotFoundByIdException {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(fineRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+    void shouldAddFineForLoan() {
+        Loan loan = Loan.builder()
+                .idLoan(1L)
+                .user(user)
+                .returned(false)
+                .build();
 
-        Fine fine = fineService.addFine(1L, "Late return");
+        when(loanRepository.findById(1L)).thenReturn(Optional.of(loan));
+        when(fineRepository.existsByLoan_IdLoan(1L)).thenReturn(false);
+        when(fineRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertThat(fine.getReason()).isEqualTo("Late return");
+        String reason = "Late return";
+
+        Fine fine = fineService.addFineForLoan(1L, reason);
+
+        assertThat(fine).isNotNull();
+        assertThat(fine.getReason()).isEqualTo(reason);
         assertThat(fine.getUser()).isEqualTo(user);
         assertThat(fine.getPaid()).isFalse();
-        System.out.println("➕ Fine created for reason: " + fine.getReason());
+        assertThat(fine.getAmount()).isEqualByComparingTo(new BigDecimal("0.10"));
+
+        System.out.println("✅ Fine added successfully for loan.");
     }
 
     @Test
-    @DisplayName("❌ Should throw if user not found when adding fine")
-    void shouldThrowWhenUserNotFound_addFine() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+    @DisplayName("❌ Should throw when loan not found when adding fine")
+    void shouldThrowWhenLoanNotFound_addFine() {
+        when(loanRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> fineService.addFine(1L, "Late return"))
-                .isInstanceOf(UserNotFoundByIdException.class);
+        assertThatThrownBy(() -> fineService.addFineForLoan(1L, "Late return"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Loan with ID 1 not found");
 
-        System.out.println("❗ Exception correctly thrown when adding fine for nonexistent user.");
+        System.out.println("❗ Exception correctly thrown when adding fine to nonexistent loan.");
     }
 
     @Test
     @DisplayName("💰 Should mark fine as paid and calculate amount")
     void shouldPayFine() throws FineNotFoundException {
         unpaidFine.setIssuedDate(LocalDateTime.now().minusDays(3));
+        unpaidFine.setPaid(false);
+
         when(fineRepository.findById(1L)).thenReturn(Optional.of(unpaidFine));
         when(fineRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Fine result = fineService.payFine(1L);
 
         assertThat(result.getPaid()).isTrue();
-        assertThat(result.getAmount()).isGreaterThan(BigDecimal.ZERO);
+        assertThat(result.getAmount()).isEqualByComparingTo("0.30");
         System.out.println("💸 Fine paid, amount was: " + result.getAmount());
     }
-
 
     @Test
     @DisplayName("❌ Should throw when fine not found while paying")

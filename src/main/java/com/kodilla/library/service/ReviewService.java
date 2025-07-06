@@ -25,7 +25,7 @@ public class ReviewService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
-    public List<Review> getReviewsForBook(Long idBook) throws BookNotFoundByIdException {
+    public List<Review> getReviewsForBook(Long idBook) {
         if (!bookRepository.existsById(idBook)) {
             throw new BookNotFoundByIdException(idBook);
         }
@@ -33,21 +33,28 @@ public class ReviewService {
     }
 
     public Review addReview(Long userId, Long bookId, String comment, Integer rating) {
+        if (rating == null || rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        }
+
+        if (comment == null || comment.trim().isEmpty()) {
+            throw new IllegalArgumentException("Comment cannot be empty.");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundByIdException(userId));
 
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundByIdException(bookId));
 
-        boolean alreadyReviewed = reviewRepository.existsByUser_IdUserAndBook_IdBook(userId, bookId);
-        if (alreadyReviewed) {
+        if (reviewRepository.existsByUser_IdUserAndBook_IdBook(userId, bookId)) {
             throw new IllegalStateException("User has already submitted a review for this book.");
         }
 
         Review review = Review.builder()
                 .user(user)
                 .book(book)
-                .comment(comment)
+                .comment(comment.trim())
                 .rating(rating)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -55,14 +62,13 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-
-    public void deleteReview(Long idReview) throws ReviewNotFoundByIdException {
+    public void deleteReview(Long idReview) {
         Review review = reviewRepository.findById(idReview)
                 .orElseThrow(() -> new ReviewNotFoundByIdException(idReview));
         reviewRepository.delete(review);
     }
 
-    public List<Review> getUserReviews(Long idUser) throws UserNotFoundByIdException {
+    public List<Review> getUserReviews(Long idUser) {
         if (!userRepository.existsById(idUser)) {
             throw new UserNotFoundByIdException(idUser);
         }
