@@ -17,8 +17,8 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 - ⭐ **Favorites** (add/remove/list)
 - 📝 **Reviews & Ratings**
 - 💰 **Fines** (issue & payment)
-- ⚙️ **Exception Handling** with consistent JSON error responses
-- 📖 **DTO + Mapper** pattern for clean architecture
+- ⚙️ **Exception Handling**
+- 📖 **DTO + Mapper**
 
 ---
 
