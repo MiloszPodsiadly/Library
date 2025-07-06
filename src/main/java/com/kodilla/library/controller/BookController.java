@@ -62,16 +62,15 @@ public class BookController {
     }
 
     @PutMapping("/{idBook}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable Long idBook, @RequestBody BookDTO bookDTO)
-            throws BookNotFoundByIdException {
-        Book updated = bookService.updateBook(idBook, bookMapper.toEntity(bookDTO));
-        return ResponseEntity.ok(bookMapper.toDto(updated));
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long idBook, @RequestBody BookDTO bookDTO) {
+        Book updatedBook = bookService.updateBook(idBook, bookMapper.toEntity(bookDTO));
+        return ResponseEntity.ok(bookMapper.toDto(updatedBook));
     }
 
     @DeleteMapping("/{idBook}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long idBook)
+    public ResponseEntity<String> deleteBook(@PathVariable Long idBook)
             throws BookNotFoundByIdException {
         bookService.deleteBook(idBook);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Book has been deleted");
     }
 }

@@ -62,9 +62,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{idUser}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long idUser) throws UserNotFoundByIdException {
+    public ResponseEntity<String> deleteUser(@PathVariable Long idUser) throws UserNotFoundByIdException {
         userService.deleteUser(idUser);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("User has been deleted");
     }
 
     @PostMapping("/token")

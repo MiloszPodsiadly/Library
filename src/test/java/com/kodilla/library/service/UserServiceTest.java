@@ -128,15 +128,26 @@ class UserServiceTest {
     @Test
     @DisplayName("🗝️ Should generate new token for valid credentials")
     void shouldGenerateNewToken() throws Exception {
+        // given
+        User user = User.builder()
+                .email("alice@example.com")
+                .passwordHash("hashedPass")
+                .build();
+
         when(userRepository.findByEmail("alice@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("pass123", "hashedPass")).thenReturn(true);
         when(jwtService.generateToken(user)).thenReturn("newToken123");
-        when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
+        // when
         User result = userService.generateNewToken("alice@example.com", "pass123");
 
+        // then
         assertThat(result.getToken()).isEqualTo("newToken123");
+        assertThat(result.getTokenCreatedAt()).isNotNull();
+        assertThat(result.getTokenExpiresAt()).isAfter(result.getTokenCreatedAt());
         assertThat(result.getTokenExpiresAt()).isAfter(LocalDateTime.now());
+
         System.out.println("🗝️ New token generated: " + result.getToken());
     }
 
@@ -148,7 +159,7 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.generateNewToken("alice@example.com", "wrong"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid credentials");
+                .hasMessageContaining("Invalid password");
 
         System.out.println("❌ Invalid credentials provided.");
     }

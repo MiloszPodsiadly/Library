@@ -63,6 +63,9 @@ gradle clean build
 
 Sample `application.yml` for local development:
 ```yml
+jwt:
+  secret: superTajnyKluczJWT12345678901234567890
+
 spring:
   profiles:
     active: dev
@@ -79,8 +82,14 @@ spring:
     username: kodilla_user
     password: kodilla_password
 
-jwt:
-  secret: superTajnyKluczJWT12345678901234567890
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: true
 
 ---
 
@@ -95,14 +104,13 @@ spring:
     password: kodilla_password
 
   jpa:
-    database: mysql
     hibernate:
       ddl-auto: update
     show-sql: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
         format_sql: false
-    database-platform: org.hibernate.dialect.MySQL8Dialect
 
 logging:
   level:
@@ -113,9 +121,6 @@ logging:
     org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration: ERROR
 
 debug: false
-
-jwt:
-  secret: superTajnyKluczJWT12345678901234567890
 
 ---
 
@@ -136,9 +141,6 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     generate-ddl: true
     show-sql: false
-
-jwt:
-  secret: test-secret-key
 ```
 Sample `docker-compose.yml` for local development:
 ```yml
@@ -264,7 +266,7 @@ Authorization: Bearer <your_token_here>
 | DELETE | `/users/{id}`  | Delete user         |
 
 
-- Create User of Library
+- Register user of library
 - Example request:
   ```json
   {
@@ -276,15 +278,44 @@ Authorization: Bearer <your_token_here>
 
 ### 📚 Books
 
-| Method | Endpoint               | Description            |
-| ------ | ---------------------- | ---------------------- |
-| GET    | `/books`               | List all books         |
-| GET    | `/books/{id}`          | Get book by ID         |
-| GET    | `/books/search/title`  | Search books by title  |
-| GET    | `/books/search/author` | Search books by author |
-| POST   | `/books`               | Add new book           |
-| PUT    | `/books/{id}`          | Update book            |
-| DELETE | `/books/{id}`          | Delete book            |
+| Method | Endpoint                                 | Description            |
+| ------ |------------------------------------------| ---------------------- |
+| GET    | `/books`                                 | List all books         |
+| GET    | `/books/{id}`                            | Get book by ID         |
+| GET    | `/books/search/title?keyword={keyword}`  | Search books by title  |
+| GET    | `/books/search/author?keyword={keyword}` | Search books by author |
+| POST   | `/books`                                 | Add new book           |
+| PUT    | `/books/{id}`                            | Update book            |
+| DELETE | `/books/{id}`                            | Delete book            |
+
+- Add new book to library
+- Example request:
+  ```json
+  {
+    "title": "Book Title",
+    "author": "Author",
+    "isbn": "0000000000000001"
+  } 
+  ```
+### 🗓️ Reservations
+
+| Method | Endpoint                                  | Description               |
+| ------ | ----------------------------------------- | ------------------------- |
+| POST   | `/reservations?idUser={uid}&idBook={bid}` | Create a reservation      |
+| DELETE | `/reservations/{id}`                      | Cancel a reservation      |
+| DELETE | `/reservations/delete/{id}`               | Delete a reservation      |
+| GET    | `/reservations/user/{userId}`             | List reservations by user |
+| GET    | `/reservations/book/{bookId}`             | List reservations by book |
+
+### 📦 Loans
+
+| Method | Endpoint                           | Description          |
+| ------ | ---------------------------------- | -------------------- |
+| POST   | `/loans?idUser={uid}&idBook={bid}` | Create a new loan    |
+| PUT    | `/loans/{loanId}/return`           | Return borrowed book |
+| PUT    | `/loans/{loanId}/extend`           | Extend a loan        |
+| GET    | `/loans/user/{userId}`             | List loans by user   |
+| GET    | `/loans/active`                    | List active loans    |
 
 ### 📊 Book Statistics
 
@@ -315,26 +346,6 @@ Authorization: Bearer <your_token_here>
 | DELETE | `/reviews/{id}`                                             | Delete a review         |
 | GET    | `/reviews/book/{bookId}`                                    | List reviews for a book |
 | GET    | `/reviews/user/{userId}`                                    | List reviews by a user  |
-
-### 📦 Loans
-
-| Method | Endpoint                           | Description          |
-| ------ | ---------------------------------- | -------------------- |
-| POST   | `/loans?idUser={uid}&idBook={bid}` | Create a new loan    |
-| PUT    | `/loans/{loanId}/return`           | Return borrowed book |
-| PUT    | `/loans/{loanId}/extend`           | Extend a loan        |
-| GET    | `/loans/user/{userId}`             | List loans by user   |
-| GET    | `/loans/active`                    | List active loans    |
-
-### 🗓️ Reservations
-
-| Method | Endpoint                                  | Description               |
-| ------ | ----------------------------------------- | ------------------------- |
-| POST   | `/reservations?idUser={uid}&idBook={bid}` | Create a reservation      |
-| DELETE | `/reservations/{id}`                      | Cancel a reservation      |
-| DELETE | `/reservations/delete/{id}`               | Delete a reservation      |
-| GET    | `/reservations/user/{userId}`             | List reservations by user |
-| GET    | `/reservations/book/{bookId}`             | List reservations by book |
 
 ### 💳 Fines
 
