@@ -20,6 +20,7 @@
 
     import org.springframework.scheduling.annotation.Scheduled;
     import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
 
     @Service
     @RequiredArgsConstructor
@@ -100,7 +101,7 @@
             if (days < 0) days = 0;
             return DAILY_RATE.multiply(BigDecimal.valueOf(days));
         }
-
+        @Transactional
         @Scheduled(fixedRate = 60 * 1000)
         public void checkOverdueLoans() {
             LocalDateTime now = LocalDateTime.now();
@@ -110,11 +111,7 @@
                     .toList();
 
             for (Loan loan : overdueLoans) {
-                boolean fineExists = StreamSupport.stream(fineRepository.findAll().spliterator(), false)
-                        .anyMatch(fine -> fine.getLoan() != null &&
-                                fine.getLoan().getIdLoan().equals(loan.getIdLoan()));
-
-                if (!fineExists) {
+                if (!fineRepository.existsByLoan_IdLoan(loan.getIdLoan())) {
                     Fine fine = Fine.builder()
                             .user(loan.getUser())
                             .loan(loan)
@@ -128,6 +125,7 @@
                 }
             }
         }
+        @Transactional
         @Scheduled(cron = "0 0 10 * * *")
         public void increaseDailyFines() {
             LocalDate today = LocalDate.now();

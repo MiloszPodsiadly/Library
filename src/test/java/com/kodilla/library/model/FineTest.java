@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FineTest {
 
     @Test
-    @DisplayName("💰 Should create Fine with default unpaid status")
+    @DisplayName("hould💰 S create Fine with default unpaid status")
     void shouldCreateUnpaidFine() {
         User user = User.builder()
                 .idUser(1L)

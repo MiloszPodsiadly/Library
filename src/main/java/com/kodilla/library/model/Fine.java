@@ -31,7 +31,7 @@ public class Fine {
     private Long idFine;
 
     @OneToOne
-    @JoinColumn(name = "loan_id")
+    @JoinColumn(name = "loan_id", unique = true, nullable = false)
     private Loan loan;
 
     private BigDecimal amount;
