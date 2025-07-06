@@ -239,37 +239,40 @@ LibraryApplication <-- with method main class
 gradle bootRun
 ```
 
-API will be available at: `http://localhost:8080/api/v1`
-
 ---
 
 ## 📃 API Documentation
 
+API will be available at: `http://localhost:8080/api/v1`
+
 ### 🔐 Authentication
 
-**POST** `/api/v1/users/token?email={email}&password={password}`
+**PUT** `/users/{id}`
+**DELETE** `/users/{id}`
 
-- Generate JWT token
-- Response:
-  ```json
-  {
-    "idUser": 1,
-    "email": "john.doe@example.com",
-    "name": "John",
-    "surname": "Doe",
-    "token": "eyJhbGciOi..."
-  }
-  ```
+Authorization: Bearer <your_token_here>
 
 ### 👤 Users
 
-| Method | Endpoint      | Description         |
-| ------ | ------------- | ------------------- |
-| POST   | `/users`      | Register a new user |
-| GET    | `/users`      | List all users      |
-| GET    | `/users/{id}` | Get user by ID      |
-| PUT    | `/users/{id}` | Update user         |
-| DELETE | `/users/{id}` | Delete user         |
+| Method | Endpoint       | Description         |
+|--------|----------------|---------------------|
+| POST   | `/users`       | Register a new user |
+| GET    | `/users`       | List all users      |
+| GET    | `/users/{id}`  | Get user by ID      |
+| PUT    | `/users/{id}`  | Update user         |
+| POST   | `/users/token` | Generate token      |
+| DELETE | `/users/{id}`  | Delete user         |
+
+
+- Create User of Library
+- Example request:
+  ```json
+  {
+    "email": "john.doe@example.com",
+    "name": "John Doe",
+    "passwordHash": "DoePassword"
+  }
+  ```
 
 ### 📚 Books
 

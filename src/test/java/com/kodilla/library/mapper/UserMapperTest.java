@@ -53,6 +53,7 @@ class UserMapperTest {
     @DisplayName("📥 Should map UserDTO to User")
     void shouldMapToEntity() {
         UserDTO dto = new UserDTO(
+                2L,
                 "Bob",
                 "bob@example.com",
                 true,
@@ -64,10 +65,11 @@ class UserMapperTest {
 
         User result = mapper.toEntity(dto);
 
+        assertThat(result.getIdUser()).isEqualTo(2L);
         assertThat(result.getName()).isEqualTo("Bob");
         assertThat(result.getEmail()).isEqualTo("bob@example.com");
         assertThat(result.getToken()).isEqualTo("jwt-token");
-        assertThat(result.getPasswordHash()).isEqualTo("plainPassword"); // raw password, not encoded here
+        assertThat(result.getPasswordHash()).isEqualTo("plainPassword");
 
         System.out.println("✅ Successfully mapped UserDTO to User.");
     }

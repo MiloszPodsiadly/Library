@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kodilla.library.dto.UserDTO;
@@ -44,11 +43,12 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO dto) {
-        User userToSave = userMapper.toEntity(dto);
-        User saved = userService.createUser(userToSave);
-        return ResponseEntity.ok(userMapper.toDto(saved));
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+        User user = userMapper.toEntity(userDTO);
+        User createdUser = userService.createUser(user);
+        return ResponseEntity.ok(userMapper.toDto(createdUser));
     }
+
 
     @PutMapping("/{idUser}")
     public ResponseEntity<UserDTO> updateUser(
@@ -68,11 +68,13 @@ public class UserController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<UserDTO> generateToken(
-            @RequestParam String email,
-            @RequestParam String password
-    ) throws UserNotFoundByMailException {
-        User user = userService.generateNewToken(email, password);
+    public ResponseEntity<UserDTO> generateToken(@RequestBody UserDTO userDTO)
+            throws UserNotFoundByMailException {
+
+        String email = userDTO.email();
+        String passwordHash = userDTO.passwordHash();
+
+        User user = userService.generateNewToken(email, passwordHash);
         return ResponseEntity.ok(userMapper.toDto(user));
     }
 }

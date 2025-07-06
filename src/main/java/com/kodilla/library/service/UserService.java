@@ -3,6 +3,8 @@ package com.kodilla.library.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.kodilla.library.dto.UserDTO;
+import com.kodilla.library.exception.UserAlreadyExistsException;
 import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.exception.UserNotFoundByMailException;
 import com.kodilla.library.jwt.JwtService;
@@ -42,8 +44,23 @@ public class UserService {
 
     @Transactional
     public User createUser(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            throw new IllegalArgumentException("Name cannot be null or blank.");
+        }
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email cannot be null or blank.");
+        }
+        if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
+            throw new IllegalArgumentException("Password cannot be null or blank.");
+        }
+
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException(user.getEmail());
+        }
+
         user.setIdUser(null);
         String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
+
         User newUser = User.builder()
                 .name(user.getName())
                 .email(user.getEmail())
@@ -67,6 +84,22 @@ public class UserService {
 
         User existing = getUserById(updated.getIdUser());
 
+        String newName = updated.getName() != null ? updated.getName() : existing.getName();
+        String newEmail = updated.getEmail() != null ? updated.getEmail() : existing.getEmail();
+
+        if (newName == null || newName.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be null or blank.");
+        }
+        if (newEmail == null || newEmail.isBlank()) {
+            throw new IllegalArgumentException("Email cannot be null or blank.");
+        }
+
+        userRepository.findByEmail(newEmail).ifPresent(userWithEmail -> {
+            if (!userWithEmail.getIdUser().equals(existing.getIdUser())) {
+                throw new UserAlreadyExistsException(newEmail);
+            }
+        });
+
         String newPasswordHash = existing.getPasswordHash();
         if (updated.getPasswordHash() != null && !updated.getPasswordHash().isBlank()) {
             newPasswordHash = passwordEncoder.encode(updated.getPasswordHash());
@@ -74,8 +107,8 @@ public class UserService {
 
         User modifiedUser = User.builder()
                 .idUser(existing.getIdUser())
-                .name(updated.getName() != null ? updated.getName() : existing.getName())
-                .email(updated.getEmail() != null ? updated.getEmail() : existing.getEmail())
+                .name(newName)
+                .email(newEmail)
                 .passwordHash(newPasswordHash)
                 .active(updated.getActive() != null ? updated.getActive() : existing.getActive())
                 .token(existing.getToken())
@@ -89,6 +122,7 @@ public class UserService {
         return userRepository.save(modifiedUser);
     }
 
+
     @Transactional
     public void deleteUser(Long idUser) throws UserNotFoundByIdException {
         if (!accessGuard.checkOwner(idUser)) {
@@ -101,11 +135,11 @@ public class UserService {
     }
 
     @Transactional
-    public User generateNewToken(String email, String rawPassword) throws UserNotFoundByMailException {
+    public User generateNewToken(String email, String passwordHash) throws UserNotFoundByMailException {
         User user = getUserByEmail(email);
 
-        if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid credentials");
+        if (!passwordEncoder.matches(passwordHash, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Invalid password");
         }
 
         String token = jwtService.generateToken(user);

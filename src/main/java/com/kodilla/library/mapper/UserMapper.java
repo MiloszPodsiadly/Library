@@ -16,6 +16,7 @@ public class UserMapper {
             return null;
         }
         return new UserDTO(
+                user.getIdUser(),
                 user.getName(),
                 user.getEmail(),
                 user.getActive(),
@@ -30,15 +31,17 @@ public class UserMapper {
         if (dto == null) return null;
 
         return User.builder()
+                .idUser(dto.idUser())
                 .name(dto.name())
                 .email(dto.email())
                 .active(dto.active())
                 .token(dto.token())
                 .tokenCreatedAt(dto.tokenCreatedAt())
                 .tokenExpiresAt(dto.tokenExpiresAt())
-                .passwordHash(dto.rawPassword())
+                .passwordHash(dto.passwordHash())
                 .build();
     }
+
 
     public List<UserDTO> toDtoList(List<User> users) {
         return users.stream()

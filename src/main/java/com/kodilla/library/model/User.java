@@ -22,68 +22,56 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 @Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
     @Setter
     @Column(name = "id_user")
     private Long idUser;
 
     @Setter
-    @Getter
     @Column(name = "name")
     private String name;
 
-    @Getter
     @Setter
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
-
-    @Getter
     @Column(name = "password_hash")
-    protected String passwordHash;
+    private String passwordHash;
 
     @Builder.Default
     @Setter
-    @Getter
     @Column(name = "active")
     private Boolean active = false;
 
     @Setter
-    @Getter
     @Column(name = "token")
     private String token;
 
     @Setter
-    @Getter
     @Column(name = "token_created_at")
     private LocalDateTime tokenCreatedAt;
 
     @Setter
-    @Getter
     @Column(name = "token_expires_at")
     private LocalDateTime tokenExpiresAt;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @Getter
     private List<Loan> loans;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @Getter
     private List<Reservation> reservations;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @Getter
     private List<Review> reviews;
+
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @Getter
     private List<Fine> fines;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @Getter
     private List<FavoriteBook> favoriteBooks;
 }
