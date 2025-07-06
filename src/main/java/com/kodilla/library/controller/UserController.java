@@ -49,7 +49,6 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDto(createdUser));
     }
 
-
     @PutMapping("/{idUser}")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable Long idUser,

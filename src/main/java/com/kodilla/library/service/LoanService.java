@@ -3,7 +3,9 @@ package com.kodilla.library.service;
 import com.kodilla.library.exception.*;
 import com.kodilla.library.model.*;
 import com.kodilla.library.repository.*;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +49,6 @@ public class LoanService {
         if (activeLoans >= 3) {
             throw new LoanNotAllowedException("User has reached max 3 active loans.");
         }
-
         Loan loan = Loan.builder()
                 .user(user)
                 .book(book)

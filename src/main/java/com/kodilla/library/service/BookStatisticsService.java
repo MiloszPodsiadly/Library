@@ -64,7 +64,7 @@ public class BookStatisticsService {
     }
 
     public String getLoanCountForBook(Long idBook) {
-        Long count = loanRepository.countByBook_IdBook(idBook);
+        long count = loanRepository.countByBook_IdBook(idBook);
         return "Loan count for book ID " + idBook + ": " + count;
     }
 

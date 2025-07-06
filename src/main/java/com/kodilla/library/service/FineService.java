@@ -12,7 +12,6 @@
     import com.kodilla.library.exception.UserNotFoundByIdException;
     import com.kodilla.library.model.Fine;
     import com.kodilla.library.model.Loan;
-    import com.kodilla.library.model.User;
     import com.kodilla.library.repository.FineRepository;
     import com.kodilla.library.repository.LoanRepository;
     import com.kodilla.library.repository.UserRepository;

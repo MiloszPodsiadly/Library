@@ -16,6 +16,7 @@ import com.kodilla.library.jwt.JwtAuthFilter;
 import com.kodilla.library.jwt.JwtService;
 import com.kodilla.library.repository.UserRepository;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

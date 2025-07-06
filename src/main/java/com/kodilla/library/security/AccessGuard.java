@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.kodilla.library.model.User;
 @Component
 public class AccessGuard {
-
     public boolean checkOwner(Long idUser) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -20,7 +19,6 @@ public class AccessGuard {
         if (user.getTokenExpiresAt() == null || user.getTokenExpiresAt().isBefore(LocalDateTime.now())) {
             throw new SecurityException("Token has expired please generate token again");
         }
-
         return user.getIdUser().equals(idUser);
     }
 }

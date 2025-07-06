@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import com.kodilla.library.exception.BookNotFoundByIdException;
-import com.kodilla.library.exception.ReservationNotAllowedException;
-import com.kodilla.library.exception.ReservationNotFoundException;
 import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.model.Book;
 import com.kodilla.library.model.BookStatus;
@@ -75,7 +73,7 @@ public class ReservationService {
         List<Reservation> reservations = reservationRepository
                 .findAllByBook_IdBook(idBook)
                 .stream()
-                .filter(Reservation::getActive) // tylko aktywne rezerwacje
+                .filter(Reservation::getActive)
                 .toList();
 
         if (reservations.isEmpty()) {
@@ -89,31 +87,6 @@ public class ReservationService {
 
         return lastReservationEndDate.plusDays(1)
                 .withHour(10).withMinute(0).withSecond(0);
-    }
-
-    private boolean isCancelable(Reservation reservation) {
-        return reservation.getCreatedAt()
-                .plusHours(1)
-                .isAfter(LocalDateTime.now());
-    }
-
-    private void deactivateReservation(Reservation reservation) {
-        reservation.setActive(false);
-        reservationRepository.save(reservation);
-    }
-
-    private void updateBookStatusIfNoActiveReservations(Book book) {
-        boolean hasActiveReservations = reservationRepository
-                .findAllByBook_IdBook(book.getIdBook())
-                .stream()
-                .anyMatch(Reservation::getActive);
-
-        if (!hasActiveReservations) {
-            book.setAvailable(true);
-            book.getStatuses().clear();
-            book.getStatuses().add(BookStatus.AVAILABLE);
-            bookRepository.save(book);
-        }
     }
 
     @Transactional

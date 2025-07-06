@@ -3,7 +3,6 @@ package com.kodilla.library.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.kodilla.library.dto.UserDTO;
 import com.kodilla.library.exception.UserAlreadyExistsException;
 import com.kodilla.library.exception.UserNotFoundByIdException;
 import com.kodilla.library.exception.UserNotFoundByMailException;
@@ -121,7 +120,6 @@ public class UserService {
 
         return userRepository.save(modifiedUser);
     }
-
 
     @Transactional
     public void deleteUser(Long idUser) throws UserNotFoundByIdException {

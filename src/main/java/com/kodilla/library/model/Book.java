@@ -1,6 +1,5 @@
 package com.kodilla.library.model;
 
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +71,4 @@ public class Book {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Set<BookStatus> statuses = new HashSet<>(Set.of(BookStatus.AVAILABLE));
-
-
 }

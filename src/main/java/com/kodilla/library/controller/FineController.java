@@ -1,9 +1,12 @@
 package com.kodilla.library.controller;
 
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import com.kodilla.library.dto.FineDTO;
 import com.kodilla.library.exception.FineNotFoundException;
 import com.kodilla.library.exception.UserNotFoundByIdException;
@@ -34,7 +37,6 @@ public class FineController {
         Fine fine = fineService.addFineForLoan(idLoan, reason);
         return ResponseEntity.ok(fineMapper.toDto(fine));
     }
-
 
     @PutMapping("/pay/{idFine}")
     public ResponseEntity<FineDTO> payFine(@PathVariable Long idFine)
