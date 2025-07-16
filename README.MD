@@ -37,27 +37,16 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 
 ## 🚪 Prerequisites
 
-- JDK 21+
-- Gradle 8.7.0+
-- MySQL 8+
 - Docker & Docker Compose (optional)
 
 ---
 
 ## 📖 Installation
-
+Download the project and enter it via the console and then type:
 ```bash
-git clone https://github.com/MiloszPodsiadly/Library.git
+docker-compose up --build
 ```
-
-Configure database connection in `src/main/resources/application.yml`.
-
-Build the project:
-
-```bash
-gradle clean build
-```
----
+If needed configure database connection in `src/main/resources/application.yml`.
 
 ## ⚖️ Configuration
 
@@ -68,7 +57,7 @@ jwt:
 
 spring:
   profiles:
-    active: dev
+    active: docker
 
 ---
 
@@ -144,6 +133,8 @@ spring:
 ```
 Sample `docker-compose.yml` for local development:
 ```yml
+version: "3.8"
+
 services:
   app:
     build: .
@@ -151,16 +142,17 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy  # ✅ Wait for MySQL to be healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: kodilla_user
       SPRING_DATASOURCE_PASSWORD: kodilla_password
       JWT_SECRET: superTajnyKluczJWT12345678901234567890
+    entrypoint: [ "sh", "-c", "until nc -z mysql 3306; do echo 'Waiting for MySQL...'; sleep 2; done; java -jar /app.jar" ]
     networks:
       - library-network
-
 
   mysql:
     image: mysql:8.0
@@ -176,12 +168,18 @@ services:
       - library-network
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:  # ✅ This checks if MySQL is ready
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 networks:
   library-network:
 
 volumes:
   mysql-data:
+
 ```
 Sample `build.gradle` for local development:
 ```bash
@@ -227,18 +225,11 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 ```
----
-
 ## 🚀 Running the Application
+
 
 ```bash
 docker-compose up --build
-```
-```bash
-LibraryApplication <-- with method main class
-```
-```bash
-gradle bootRun
 ```
 
 ---
