@@ -8,7 +8,7 @@ services:
       - "8080:8080"
     depends_on:
       mysql:
-        condition: service_healthy  # ✅ Wait for MySQL to be healthy
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
@@ -33,7 +33,7 @@ services:
       - library-network
     volumes:
       - mysql-data:/var/lib/mysql
-    healthcheck:  # ✅ This checks if MySQL is ready
+    healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 5s
       timeout: 5s

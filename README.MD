@@ -181,6 +181,7 @@ networks:
 volumes:
   mysql-data:
 
+
 ```
 Sample `build.gradle` for local development:
 ```bash
@@ -232,7 +233,6 @@ tasks.named('test') {
 ```bash
 docker-compose up --build
 ```
-
 ---
 
 ## 📃 API Documentation
@@ -241,7 +241,7 @@ API will be available at: `http://localhost:8080/api/v1`
 
 ### Testing app
 
-I would recommend Postman. You can easily check methods.
+I would recommend Postman. You can easily check controllers.
 
 ### 🔐 Authentication
 
