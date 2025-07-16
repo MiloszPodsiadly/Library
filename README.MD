@@ -28,7 +28,6 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 - **Spring Boot 3.4.4**
 - **Hibernate** / JPA
 - **MySQL 8.0 || H2 for testing**
-- **MapStruct**
 - **Lombok**
 - **JUnit 5 & Mockito**
 - **Docker & Docker-Compose**
@@ -44,6 +43,7 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 ## 📖 Installation
 Download the project from github.com, unpack it and enter it via the console 
 to unpack destination and then type:
+
 ```bash
 docker-compose up --build
 ```
@@ -144,7 +144,7 @@ services:
       - "8080:8080"
     depends_on:
       mysql:
-        condition: service_healthy  # ✅ Wait for MySQL to be healthy
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/kodilla_library?serverTimezone=Europe/Warsaw&useSSL=false&allowPublicKeyRetrieval=true
@@ -169,7 +169,7 @@ services:
       - library-network
     volumes:
       - mysql-data:/var/lib/mysql
-    healthcheck:  # ✅ This checks if MySQL is ready
+    healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 5s
       timeout: 5s
@@ -238,6 +238,10 @@ docker-compose up --build
 ## 📃 API Documentation
 
 API will be available at: `http://localhost:8080/api/v1`
+
+### Testing app
+
+I would recommend Postman. You can easily check methods.
 
 ### 🔐 Authentication
 
