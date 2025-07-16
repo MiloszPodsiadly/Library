@@ -26,17 +26,17 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 
 - **Java 21**
 - **Spring Boot 3.4.4**
-- **Hibernate** / JPA
-- **MySQL 8.0 || H2 for testing**
+- **Hibernate**
+- **MySQL || H2 for testing**
 - **Lombok**
 - **JUnit 5 & Mockito**
-- **Docker & Docker-Compose**
+- **Docker**
 
 ---
 
 ## 🚪 Prerequisites
 
-- Docker & Docker Compose (optional)
+- Docker installed locally.
 
 ---
 
@@ -237,7 +237,7 @@ docker-compose up --build
 
 API will be available at: `http://localhost:8080/api/v1`
 
-### Testing app
+## 🧪 Testing app
 
 I would recommend Postman. You can easily check controllers.
 
@@ -261,7 +261,7 @@ Authorization: Bearer <your_token_here>
 
 
 - Register user of library
-- Example request:
+- Example request POST:
   ```json
   {
     "email": "john.doe@example.com",
@@ -283,7 +283,7 @@ Authorization: Bearer <your_token_here>
 | DELETE | `/books/{id}`                            | Delete book            |
 
 - Add new book to library
-- Example request:
+- Example request POST:
   ```json
   {
     "title": "Book Title",
@@ -346,7 +346,7 @@ http://localhost:8080/api/v1/favorites?idUser=1&idBook=1
 | GET    | `/reviews/user/{id}` | List reviews by a user  |
 
 - Leave a review
-- Example request:
+- Example request POST:
  ```json
   {
   "idUser": 1,
@@ -383,9 +383,9 @@ http://localhost:8080/api/v1/books/statistics/1
 | PUT    | `/fines/pay/{id}`        | Mark a fine as paid |
 
 - Create fine
-- Example request:
+- Example request GET:
  ```bash
-"Too late return of the book"
+http://localhost:8080/api/v1/fines/user/1
 ```
 ---
 
