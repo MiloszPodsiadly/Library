@@ -302,10 +302,10 @@ Authorization: Bearer <your_token_here>
 | GET    | `/reservations/book/{bookId}`           | List reservations by book |
 
 - Make a new reservation
-- Example request:
-  ```bash
-  POST http://localhost:8080/api/v1/reservations?idUser=1&idBook=1
-  ```
+- Example request POST:
+```bash
+http://localhost:8080/api/v1/reservations?idUser=1&idBook=1
+```
 ### 📦 Loans
 
 | Method | Endpoint                         | Description          |
@@ -317,10 +317,11 @@ Authorization: Bearer <your_token_here>
 | GET    | `/loans/active`                  | List active loans    |
 
 - Make a loan (only during reservation)
-- Example request:
- ```bash
-  POST http://localhost:8080/api/v1/loans?idUser=1&idBook=1
-  ```
+- Example request POST:
+ 
+```bash
+http://localhost:8080/api/v1/loans?idUser=1&idBook=1
+```
 ### ⭐ Favorites
 
 | Method | Endpoint                             | Description           |
@@ -330,10 +331,10 @@ Authorization: Bearer <your_token_here>
 | DELETE | `/favorites?idUser={id}&idBook={id}` | Remove from favorites |
 
 - Add book to favorties
-- Example request:
- ```bash
-  POST http://localhost:8080/api/v1/favorites?idUser=1&idBook=1
-  ```
+- Example request POST:
+```bash
+http://localhost:8080/api/v1/favorites?idUser=1&idBook=1
+```
 
 ### 📕 Reviews
 
@@ -369,10 +370,10 @@ Authorization: Bearer <your_token_here>
 | GET    | `/books/statistics/favorites/{id}`     | Favorite count for a book    |
 
 - Check Statistic for the book 
-- Example request:
- ```bash
-  GET http://localhost:8080/api/v1/books/statistics/1
-  ```
+- Example request GET:
+```bash
+http://localhost:8080/api/v1/books/statistics/1
+```
 ### 💳 Fines
 
 | Method | Endpoint                 | Description         |
