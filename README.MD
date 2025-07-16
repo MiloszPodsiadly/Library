@@ -42,7 +42,8 @@ Comprehensive, production-ready RESTful API for an online library, built with Sp
 ---
 
 ## 📖 Installation
-Download the project and enter it via the console and then type:
+Download the project from github.com, unpack it and enter it via the console 
+to unpack destionation and then type:
 ```bash
 docker-compose up --build
 ```
