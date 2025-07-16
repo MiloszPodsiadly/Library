@@ -134,8 +134,6 @@ spring:
 ```
 Sample `docker-compose.yml` for local development:
 ```yml
-version: "3.8"
-
 services:
   app:
     build: .
