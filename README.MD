@@ -304,7 +304,7 @@ Authorization: Bearer <your_token_here>
 - Make a new reservation
 - Example request:
   ```bash
-  POST http://localhost:8080/api/v1/reservations?idUser={id}&idBook={id}
+  POST http://localhost:8080/api/v1/reservations?idUser=1&idBook=1
   ```
 ### 📦 Loans
 
@@ -319,7 +319,7 @@ Authorization: Bearer <your_token_here>
 - Make a loan (only during reservation)
 - Example request:
  ```bash
-  POST http://localhost:8080/api/v1/loans?idUser={id}&idBook={id}
+  POST http://localhost:8080/api/v1/loans?idUser=1&idBook=1
   ```
 ### ⭐ Favorites
 
@@ -332,7 +332,7 @@ Authorization: Bearer <your_token_here>
 - Add book to favorties
 - Example request:
  ```bash
-  POST http://localhost:8080/api/v1/favorites?idUser={id}&idBook={id}
+  POST http://localhost:8080/api/v1/favorites?idUser=1&idBook=1
   ```
 
 ### 📕 Reviews
@@ -371,7 +371,7 @@ Authorization: Bearer <your_token_here>
 - Check Statistic for the book 
 - Example request:
  ```bash
-  GET http://localhost:8080/api/v1/books/statistics/{id}
+  GET http://localhost:8080/api/v1/books/statistics/1
   ```
 ### 💳 Fines
 
